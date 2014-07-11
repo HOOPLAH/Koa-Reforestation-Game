@@ -31,7 +31,7 @@ try:
         packets = server.update()
         
     teacher = Teacher(server)
-    teacher.add_to_student_points(list(students.values())[0], 100)
+    teacher.add_to_student_points(students.values()[0], 100)
     farm = FarmServer(server, teacher)
     
 except IOError:

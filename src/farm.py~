@@ -3,35 +3,30 @@ import src.net as net
 import src.res as res
 import src.const as const
 
+from src.farm_interface import FarmInterface
+
 class FarmLandItem: # something placeable on the farm (ex. trees)
     def __init__(self, path, pos):
         self.path = path # need path to identify when sending to server
         self.texture = sf.Texture.from_file(self.path)
         self.sprite = sf.Sprite(self.texture)
+        self.sprite.position = pos
         self.position = pos
         
     def draw(self, target):
         target.draw(self.sprite)
-        
-    def send_item(self, client):
-        packet = net.Packet()
-        packet.write(const.packet_send_resource)
-        packet.write(self.path)
-        packet.write(self.position.x)
-        packet.write(self.position.y)
-        client.send(packet)
 
 class FarmClient:
-    def __init__(self, client, student):
+    def __init__(self, input, farm_interface, client, student):
+        self.input = input
+        self.farm_interface = farm_interface
         self.client = client
-        client.add_handler(self)
+        self.student_owner = student # the owner of the far
         
-        self.student_owner = student # the owner of the farm
+        client.add_handler(self)
+        self.input.add_mouse_handler(self.farm_interface)
         
         self.land_items = []
-        test = FarmLandItem("content/textures/tree.png", sf.Vector2(32, 32))
-        self.land_items.append(test)
-        test.send_item(self.client)
         
     def handle_packet(self, packet):
         packet_id = packet.read()
@@ -39,6 +34,12 @@ class FarmClient:
         if packet_id == const.packet_add_points:
             self.student_owner.points = packet.read()
             print(self.student_owner.first_name, "'s points:", self.student_owner.points)
+        elif packet_id == const.packet_place_item:\
+            item_id = packet.read()
+            pos_x = packet.read()
+            pos_y = packet.read()
+            item = FarmLandItem(const.items[item_id], sf.Vector2(pos_x, pos_y))
+            self.land_items.append(item)\
     
     def draw(self, target):
         points = sf.Text("0", res.font_8bit, 20)
@@ -48,6 +49,9 @@ class FarmClient:
         
         for item in self.land_items:
             item.draw(target)
+            
+    def update(self, dt):
+        self.input.handle()
             
 
 class FarmServer:
@@ -59,12 +63,26 @@ class FarmServer:
         
         self.land_items = []
         
-    def handle_packet(self, packet):
+    def handle_packet(self, packet, client_id):
         packet_id = packet.read()
         
-        if packet_id == const.packet_send_resource:
-            path = packet.read()
+        if packet_id == const.packet_request_place_item:
+            item_packet = net.Packet()
+            item_id = packet.read()
             pos_x = packet.read()
             pos_y = packet.read()
-            new_res = FarmLandItem(path, sf.Vector2(pos_x, pos_y))
-            self.land_items.append(new_res)
+            item_packet.write(const.packet_place_item)
+            item_packet.write(item_id)
+            item_packet.write(pos_x)
+            item_packet.write(pos_y)
+            self.server.send(client_id, item_packet)
+            item = FarmLandItem(const.items[item_id], sf.Vector2(pos_x, pos_y))
+            self.land_items.append(item)
+            
+    def draw(self, target):
+        for item in self.land_items:
+            item.draw(target)
+            
+    def update(self, dt):
+        pass
+    

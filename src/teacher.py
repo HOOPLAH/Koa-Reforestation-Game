@@ -7,17 +7,16 @@ class Teacher:
         self.server = server # Teacher is admin, knows of server!
         
     def set_student_points(self, student, points):
-        student.points = points
         packet = net.Packet()
         packet.write(const.packet_add_points)
-        packet.write(student.points)
+        packet.write(points)
         self.server.send(student.id, packet)
         
     def add_to_student_points(self, student, points):
-        student.points += points
         packet = net.Packet()
         packet.write(const.packet_add_points)
-        packet.write(student.points)
+        packet.write(points)
+        print(student.id)
         self.server.send(student.id, packet)
         
     def register_student(self, student):

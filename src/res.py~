@@ -1,0 +1,9 @@
+import sfml as sf
+
+# fonts
+
+font_8bit = sf.Font.from_file("content/fonts/8bit.ttf")
+
+# textures
+
+tree = sf.Texture.from_file("content/textures/tree.png")

@@ -1,0 +1,17 @@
+import sfml as sf
+import src.res as res
+import src.const as const
+
+class FarmServer:
+    def __init__(self, server, teacher):
+        self.server = server
+        server.add_handler(self)
+        
+        self.teacher = teacher # the owner of the farm
+        
+    def handle_packet(self, packet):
+        packet_id = packet.read()
+            
+    def draw(self, target):
+        pass
+    

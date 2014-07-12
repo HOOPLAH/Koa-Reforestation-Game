@@ -98,7 +98,6 @@ class Server:
         self.host.broadcast(0, enet.Packet(packet.to_bytes()))
 
     def send(self, client_id, packet):
-        print(client_id)
         self.peers[client_id].send(0, enet.Packet(packet.to_bytes()))
 
     def add_handler(self, handler):

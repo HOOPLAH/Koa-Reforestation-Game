@@ -16,8 +16,7 @@ class Teacher:
         packet = net.Packet()
         packet.write(const.packet_add_points)
         packet.write(points)
-        print(student.id)
-        self.server.send(student.id, packet)
+        self.server.send(student.client_id, packet)
         
     def register_student(self, student):
         pass

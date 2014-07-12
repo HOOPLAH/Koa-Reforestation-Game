@@ -25,6 +25,7 @@ class FarmClient:
         
         client.add_handler(self)
         self.input.add_mouse_handler(self.farm_interface)
+        self.input.add_key_handler(self.farm_interface)
         
         self.land_items = []
         
@@ -33,8 +34,7 @@ class FarmClient:
         
         if packet_id == const.packet_add_points:
             self.student_owner.points = packet.read()
-            print(self.student_owner.first_name, "'s points:", self.student_owner.points)
-        elif packet_id == const.packet_place_item:\
+        elif packet_id == const.packet_place_item:
             item_id = packet.read()
             pos_x = packet.read()
             pos_y = packet.read()
@@ -67,17 +67,34 @@ class FarmServer:
         packet_id = packet.read()
         
         if packet_id == const.packet_request_place_item:
+            # Read incoming packet
             item_packet = net.Packet()
             item_id = packet.read()
             pos_x = packet.read()
             pos_y = packet.read()
+            # Write new one to send to client to place tree
             item_packet.write(const.packet_place_item)
             item_packet.write(item_id)
             item_packet.write(pos_x)
             item_packet.write(pos_y)
+            # Draw this tree 
             self.server.send(client_id, item_packet)
             item = FarmLandItem(const.items[item_id], sf.Vector2(pos_x, pos_y))
             self.land_items.append(item)
+        elif packet_id == const.packet_save:
+            # Read incoming packet
+            save_packet = net.Packet()
+            student_id = packet.read()
+            points = packet.read()
+            f_name = packet.read()
+            l_name = packet.read()
+            # Check if data is already in text file
+            filename = "content/"+f_name+"_"+l_name
+            file = open(filename, 'w')
+            text = [f_name, " ", l_name, " ", str(points)]
+            file.write(text)
+            file.close()
+            print("Saved")
             
     def draw(self, target):
         for item in self.land_items:

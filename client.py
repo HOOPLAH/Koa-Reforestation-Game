@@ -31,7 +31,7 @@ try:
     client.send(login_packet)
     client.update()
     
-    farm_interface = FarmInterface(client)
+    farm_interface = FarmInterface(client, student)
     farm = FarmClient(input_sys, farm_interface, client, student)
 
 except IOError:

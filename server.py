@@ -20,7 +20,6 @@ try:
     # Receive student info
     print("Waiting for connections...")
     packets = server.wait_for_connections(1)
-    print(packets)
     students = {}
     while len(students) < 1:
         for client_id, c_packets in packets.items():

@@ -6,6 +6,9 @@ from src.student import Student
 from src.teacher import Teacher
 from src.farm import FarmServer
 
+import re
+import os.path
+
 # create the main window
 window = sf.RenderWindow(sf.VideoMode(800, 480), "Koa Reforestation Server")
 window.key_repeat_enabled = False
@@ -16,9 +19,7 @@ try:
 
     # Create the server connection
     server = net.Server(30000)
-	
-    # Receive student info
-    print("Waiting for connections...")
+    
     packets = server.wait_for_connections(1)
     students = {}
     while len(students) < 1:
@@ -28,11 +29,21 @@ try:
                 students[client_id].deserialize(packet)
                 print("Received")
         packets = server.update()
-        
+          
     teacher = Teacher(server)
-    teacher.add_to_student_points(list(students.values())[0], 100)
     farm = FarmServer(server, teacher)
     
+    # Check if user exists already
+    filename = "content/"+students[client_id].first_name+"_"+students[client_id].last_name+".txt"
+    if os.path.isfile(filename): # file exists so user exists
+        with open(filename) as file:
+            for line in file:
+                if re.search(students[client_id].first_name, line):
+                    values = line.split()
+                    teacher.set_student_points(students[client_id], values[2])
+    else:
+        print("User", students[client_id].first_name, students[client_id].last_name, "doesn't exist")
+        
 except IOError:
     exit(1)
 

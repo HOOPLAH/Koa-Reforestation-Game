@@ -2,7 +2,6 @@ import sfml as sf
 import src.net as net
 import src.const as const
 
-#from src.farm import FarmLandItem
 from src.input_system import MouseHandler
 
 keys = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z']

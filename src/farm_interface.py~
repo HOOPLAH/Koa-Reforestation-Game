@@ -34,11 +34,7 @@ class FarmInterface:
             if keys[key_code] == 's':
                 packet = net.Packet()
                 packet.write(const.packet_save)
-                #self.student.serialize(packet)
-                packet.write(1)
-                packet.write(1)
-                packet.write("L")
-                packet.write("D")
+                self.student.serialize(packet)
                 self.client.send(packet)
     
     def on_key_released(self, key_code):

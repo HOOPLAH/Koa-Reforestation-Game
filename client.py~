@@ -27,6 +27,7 @@ try:
     
     # Send the server my info
     login_packet = net.Packet()
+    login_packet.write(const.packet_login)
     student.serialize(login_packet)
     client.send(login_packet)
     client.update()

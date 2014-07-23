@@ -4,6 +4,8 @@ import sfml as sf
 
 font_8bit = sf.Font.from_file("content/fonts/8bit.ttf")
 
-# textures
+# images
 
-tree = sf.Texture.from_file("content/textures/tree.png")
+textures = {}
+textures["content/textures/tree.png"] = sf.Texture.from_file("content/textures/tree.png")
+textures["content/gui/button.png"] = sf.Texture.from_file("content/gui/button.png")

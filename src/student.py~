@@ -1,19 +1,24 @@
 import src.net as net
+import src.const as const
 
+from src.farm import FarmClient
 class Student:
-    def __init__(self, id=""):
+    def __init__(self, id="", farm=None):
         self.client_id = id
         self.points = 0
         self.first_name = ""
         self.last_name = ""
+        self.farm = farm
 
     def serialize(self, packet):
+        packet.write("Student")
         packet.write(self.client_id)
         packet.write(self.points)
         packet.write(self.first_name)
         packet.write(self.last_name)
 
     def deserialize(self, packet):
+        student = packet.read()
         self.client_id = packet.read()
         self.points = packet.read()
         self.first_name = packet.read()

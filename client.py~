@@ -3,7 +3,8 @@ import src.net as net
 import src.res as res
 import src.const as const
 
-from src.student import Student
+from src.users import Student
+from src.users import Teacher
 from src.farm import FarmClient
 from src.farm_interface import FarmInterface
 from src.input_system import InputSystem
@@ -21,19 +22,51 @@ try:
     # Connect to server
     client = net.Client("localhost", 30000)
     
-    student = Student(client.client_id)
-    student.first_name = input("first: ")
-    student.last_name = input("last: ")
+    first_name = "Lucas"
+    last_name = "DeRego"
     
     # Send the server my info
+    logged_in = False
     login_packet = net.Packet()
     login_packet.write(const.packet_login)
-    student.serialize(login_packet)
+    login_packet.write(first_name)
+    login_packet.write(last_name)
     client.send(login_packet)
     client.update()
     
-    farm_interface = FarmInterface(client, student)
-    farm = FarmClient(input_sys, farm_interface, client, student)
+    # Wait for confirm packet from server
+    while not logged_in:
+        packets = client.update()
+        for packet in packets:
+            packet_id = packet.read()
+            if packet_id == const.packet_confirm_login:
+                user_type = packet.read()
+                if user_type == "Student":
+                    student = Student(client.client_id)
+                    student.deserialize(packet)
+                    farm_interface = FarmInterface(client, student, input_sys)
+                    farm = FarmClient(input_sys, farm_interface, client, student)
+                    student.farm = farm
+                    # Load farm if student
+                    farm_packet = net.Packet()
+                    #type_of_packet = farm_packet.read()
+                    num_of_trees = farm_packet.read()
+                    #for tree in num_of_trees:
+                    type = farm_packet.read()
+                    x = farm_packet.read()
+                    y = farm_packet.read()
+                    item = FarmLandItem(type, sf.Vector2(x, y))
+                    student.farm.land_items.append(item)
+                elif user_type == "Teacher":
+                    teacher = Teacher(client.client_id)
+                    teacher.deserialize(packet)
+                    farm_interface = FarmInterface(client, teacher, input_sys)
+                    farm = FarmClient(input_sys, farm_interface, client, teacher)
+                    teacher.farm = farm
+                logged_in = True
+            elif packet_id == const.packet_deny_login:
+                print(packet.read())
+                exit(1)
 
 except IOError:
     exit(1)

@@ -47,16 +47,6 @@ try:
                     farm_interface = FarmInterface(client, student, input_sys)
                     farm = FarmClient(input_sys, farm_interface, client, student)
                     student.farm = farm
-                    # Load farm if student
-                    farm_packet = net.Packet()
-                    #type_of_packet = farm_packet.read()
-                    num_of_trees = farm_packet.read()
-                    for tree in num_of_trees:
-                        type = farm_packet.read()
-                        x = farm_packet.read()
-                        y = farm_packet.read()
-                        item = FarmLandItem(type, sf.Vector2(x, y))
-                        student.farm.land_items.append(item)
                 elif user_type == "Teacher":
                     teacher = Teacher(client.client_id)
                     teacher.deserialize(packet)

@@ -7,3 +7,5 @@ packet_save = 3
 packet_add_points = 4
 packet_request_place_item = 5 # client sends this to server when he wants to place tree
 packet_place_item = 6
+packet_request_load_farm = 7
+packet_load_farm = 8

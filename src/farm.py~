@@ -54,6 +54,15 @@ class FarmClient:
             pos_y = packet.read()
             item = FarmLandItem(item_id, sf.Vector2(pos_x, pos_y))
             self.land_items.append(item)
+        elif packet_id == const.packet_load_farm:
+            num_of_trees = packet.read()
+            print(num_of_trees)
+            for tree in range(0, int(num_of_trees)):
+                item_id = packet.read()
+                pos_x = int(packet.read())
+                pos_y = int(packet.read())
+                item = FarmLandItem(item_id, sf.Vector2(pos_x, pos_y))
+                self.land_items.append(item)
     
     def draw(self, target):
         points = sf.Text("0", res.font_8bit, 20)
@@ -108,7 +117,6 @@ class FarmServer:
                                 confirm_login_packet.write("Student")
                                 self.students[new_student.client_id].serialize(confirm_login_packet)
                                 self.server.send(client_id, confirm_login_packet)
-                                self.send_farm(new_student)
                             elif values[2] == "Teacher":
                                 new_teacher = Teacher(client_id, self.server)
                                 new_teacher.first_name = first_name
@@ -120,10 +128,9 @@ class FarmServer:
                                 confirm_login_packet.write("Teacher")
                                 self.teachers[new_teacher.client_id].serialize(confirm_login_packet)
                                 self.server.send(client_id, confirm_login_packet)
-                                
             else:
                 message = "User \'"+self.students[client_id].first_name+" "+self.students[client_id].last_name+"\' doesn't exist"
-                # Send confirm login packet
+                # Send deny login packet
                 deny_login_packet = net.Packet()
                 deny_login_packet.write(const.packet_deny_login)
                 deny_login_packet.write(message)
@@ -146,8 +153,6 @@ class FarmServer:
             filename = "content/farms/"+f_name+"_"+l_name+".txt"
             file = open(filename, 'w') # rewrite file everytime
             items = packet.read()
-            file.write(str(items))
-            file.write(" ")
             for item in range(0, items):
                 type = packet.read()
                 pos_x = packet.read()
@@ -171,25 +176,27 @@ class FarmServer:
             # Draw this tree 
             item = FarmLandItem(item_id, sf.Vector2(pos_x, pos_y))
             self.land_items.append(item)
+        elif packet_id == const.packet_request_load_farm:
+            self.send_farm(self.students[client_id])
             
     def on_connect(self, client_id):
         pass
     
     def send_farm(self, user):
         filename = "content/farms/"+user.first_name+"_"+user.last_name+".txt"
+        with open(filename, 'r') as f:
+            lines = f.readlines()
+            num_of_trees = len([l for l in lines if l.strip(' \n') != ''])
+        packet = net.Packet()
+        packet.write(const.packet_load_farm)
+        packet.write(num_of_trees)
         with open(filename) as file:
             for line in file:
                 values = line.split()
-                num_of_trees = values[0]
-                print(num_of_trees)
-                packet = net.Packet()
-                #packet.write(const.packet_load_farm)
-                packet.write(num_of_trees)
-                for tree in (num_of_trees):
-                    packet.write(values[1])
-                    packet.write(values[2])
-                    packet.write(values[3])
-                    self.server.send(user.client_id, packet)
+                packet.write(values[0])
+                packet.write(values[1])
+                packet.write(values[2])
+        self.server.send(user.client_id, packet)
     
     def draw(self, target):
         for item in self.land_items:

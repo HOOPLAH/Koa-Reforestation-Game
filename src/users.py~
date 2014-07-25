@@ -1,8 +1,6 @@
 import src.net as net
 import src.const as const
 
-from src.farm import FarmClient
-
 class Student:
     def __init__(self, id="", farm=None):
         self.client_id = id

@@ -30,7 +30,11 @@ class FarmInterface:
                 self.client.send(packet)
             
     def on_mouse_button_released(self, button, x, y):
-        pass
+        if button == sf.Mouse.LEFT and contains(self.test_button.rectangle, sf.Vector2(x, y)):
+            packet = net.Packet()
+            packet.write(const.packet_request_load_farm)
+            self.client.send(packet)
+            print("HEHE")
             
     def on_mouse_moved(self, position, move):
         pass

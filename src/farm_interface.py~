@@ -20,7 +20,7 @@ class FarmInterface:
     
     # MOUSE
     def on_mouse_button_pressed(self, mouse_button, x, y):
-        for button in buttons:
+        for button in self.buttons:
             if mouse_button == sf.Mouse.LEFT and not contains(button.rectangle, sf.Vector2(x, y)):
                 packet = net.Packet()
                 packet.write(const.packet_request_place_item)
@@ -30,7 +30,10 @@ class FarmInterface:
                 self.client.send(packet)
             
     def on_mouse_button_released(self, button, x, y):
-        pass
+        if button == sf.Mouse.LEFT and contains(self.test_button.rectangle, sf.Vector2(x, y)):
+            packet = net.Packet()
+            packet.write(const.packet_request_load_farm)
+            self.client.send(packet)
             
     def on_mouse_moved(self, position, move):
         pass

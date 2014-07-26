@@ -1,6 +1,7 @@
 import sfml as sf
 import src.net as net
 import src.const as const
+import src.res as res
 
 from src.input_system import MouseHandler
 from src.gui import Button
@@ -8,15 +9,21 @@ from src.rect import contains
 
 keys = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z']
 
+# FarmInterface draws all the buttons and the farm currently on-screen
 class FarmInterface:
-    def __init__(self, client, user, input):
+    def __init__(self, client, student, input):
         self.client = client
-        self.user = user # Can be student or teacher
+        self.student = student
+        self.input = input
+        self.input.add_mouse_handler(self)
         
         self.test_button = Button(0, 0, "button", 3, 3, input)
         
         self.buttons = []
         self.buttons.append(self.test_button)
+        
+        self.land_items = []
+        self.current_farm = None # The farm we're currently drawing
     
     # MOUSE
     def on_mouse_button_pressed(self, mouse_button, x, y):
@@ -33,8 +40,8 @@ class FarmInterface:
         if button == sf.Mouse.LEFT and contains(self.test_button.rectangle, sf.Vector2(x, y)):
             packet = net.Packet()
             packet.write(const.packet_request_load_farm)
+            packet.write(self.student.client_id)
             self.client.send(packet)
-            print("HEHE")
             
     def on_mouse_moved(self, position, move):
         pass
@@ -56,6 +63,15 @@ class FarmInterface:
     
     def on_key_released(self, key_code):
         pass
-        
+            
     def draw(self, target):
-        target.draw(self.test_button.sprite)
+        points = sf.Text("0", res.font_8bit, 20)
+        points.position = sf.Vector2(760, 0)
+        points.string = str(self.student.points)
+        target.draw(points)
+        
+        for button in self.buttons:
+            button.draw(target)
+        
+        for item in self.land_items:
+            item.draw(target)

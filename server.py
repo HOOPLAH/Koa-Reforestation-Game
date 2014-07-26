@@ -9,9 +9,7 @@ from src.farm import FarmServer
 try:
     # Create the server connection
     server = net.Server(30000)
-          
-    teacher = Teacher(server)
-    farm = FarmServer(server, teacher)
+    farm = FarmServer(server)
         
 except IOError:
     exit(1)
@@ -27,7 +25,6 @@ while True:
     frame_accum += 1
     dt_accum += dt
     if dt_accum >= 1:
-        frame_rate.string = str(frame_accum)
         dt_accum = 0
         frame_accum = 0
 

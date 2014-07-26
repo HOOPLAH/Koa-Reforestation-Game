@@ -27,7 +27,6 @@ while True:
     frame_accum += 1
     dt_accum += dt
     if dt_accum >= 1:
-        frame_rate.string = str(frame_accum)
         dt_accum = 0
         frame_accum = 0
 

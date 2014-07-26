@@ -44,15 +44,17 @@ try:
                 if user_type == "Student":
                     student = Student(client.client_id)
                     student.deserialize(packet)
-                    farm_interface = FarmInterface(client, student, input_sys)
-                    farm = FarmClient(input_sys, farm_interface, client, student)
-                    student.farm = farm
+                    student.farm_interface = FarmInterface(client, student, input_sys)
+                    student.farm = FarmClient(client, student, input_sys)
+                    # request farm for student
+                    new_packet = net.Packet()
+                    new_packet.write(const.packet_request_load_farm)
+                    new_packet.write(client.client_id)
+                    client.send(new_packet)
                 elif user_type == "Teacher":
                     teacher = Teacher(client.client_id)
                     teacher.deserialize(packet)
-                    farm_interface = FarmInterface(client, teacher, input_sys)
-                    farm = FarmClient(input_sys, farm_interface, client, teacher)
-                    teacher.farm = farm
+                    teacher.farm_interface = FarmInterface(client, teacher, input_sys)
                 logged_in = True
             elif packet_id == const.packet_deny_login:
                 print(packet.read())
@@ -80,10 +82,10 @@ while window.is_open:
     # Update connection
     client.update()
     
-    farm.update(dt)
+    student.farm.update(dt)
     
     # DRAW
     window.clear(sf.Color(120, 120, 120)) # clear screen
     window.draw(frame_rate)
-    farm.draw(window)
+    student.farm_interface.draw(window)
     window.display() # update the window

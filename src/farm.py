@@ -30,16 +30,14 @@ class FarmLandItem: # something placeable on the farm (ex. trees)
     def draw(self, target):
         target.draw(self.sprite)
 
+# FarmClient is the client's farm, FarmInterface is the farm on the screen
 class FarmClient:
-    def __init__(self, input, farm_interface, client, student):
+    def __init__(self, client, student, input):
         self.input = input
-        self.farm_interface = farm_interface
         self.client = client
-        self.student_owner = student # the owner of the farm
+        self.student = student # the owner of the farm
         
         client.add_handler(self)
-        self.input.add_mouse_handler(self.farm_interface)
-        self.input.add_key_handler(self.farm_interface)
         
         self.land_items = []
         
@@ -61,34 +59,19 @@ class FarmClient:
                 pos_x = int(packet.read())
                 pos_y = int(packet.read())
                 item = FarmLandItem(item_id, sf.Vector2(pos_x, pos_y))
-                self.land_items.append(item)
-    
-    def draw(self, target):
-        points = sf.Text("0", res.font_8bit, 20)
-        points.position = sf.Vector2(760, 0)
-        points.string = str(self.student_owner.points)
-        target.draw(points)
-        
-        for item in self.land_items:
-            item.draw(target)
-            
-        self.farm_interface.draw(target)
+                self.student.farm_interface.land_items.append(item)
             
     def update(self, dt):
         self.input.handle()
             
-
+# FarmServer controls all the farms
 class FarmServer:
-    def __init__(self, server, teacher):
+    def __init__(self, server):
         self.server = server
-        self.teacher = teacher
         
         server.add_handler(self)
         
-        self.students = {}
-        self.teachers = {}
-        
-        self.land_items = []
+        self.users = {}
         
     def handle_packet(self, packet, client_id):
         packet_id = packet.read()
@@ -109,23 +92,23 @@ class FarmServer:
                                 new_student.first_name = first_name
                                 new_student.last_name = last_name
                                 new_student.points = values[3]
-                                self.students[client_id] = new_student
+                                self.users[client_id] = new_student
                                 # Send confirm login packet
                                 confirm_login_packet = net.Packet()
                                 confirm_login_packet.write(const.packet_confirm_login)
                                 confirm_login_packet.write("Student")
-                                self.students[new_student.client_id].serialize(confirm_login_packet)
+                                new_student.serialize(confirm_login_packet)
                                 self.server.send(client_id, confirm_login_packet)
                             elif values[2] == "Teacher":
                                 new_teacher = Teacher(client_id, self.server)
                                 new_teacher.first_name = first_name
                                 new_teacher.last_name = last_name
-                                self.teachers[client_id] = new_teacher
+                                self.users[client_id] = new_teacher
                                 # Send confirm login packet
                                 confirm_login_packet = net.Packet()
                                 confirm_login_packet.write(const.packet_confirm_login)
                                 confirm_login_packet.write("Teacher")
-                                self.teachers[new_teacher.client_id].serialize(confirm_login_packet)
+                                self.users[new_teacher.client_id].serialize(confirm_login_packet)
                                 self.server.send(client_id, confirm_login_packet)
             else:
                 message = "User \'"+self.students[client_id].first_name+" "+self.students[client_id].last_name+"\' doesn't exist"
@@ -176,31 +159,26 @@ class FarmServer:
             item = FarmLandItem(item_id, sf.Vector2(pos_x, pos_y))
             self.land_items.append(item)
         elif packet_id == const.packet_request_load_farm:
-            self.send_farm(self.students[client_id])
+            farm_owner_id = packet.read()
+            student = self.users[farm_owner_id]
+            filename = "content/farms/"+student.first_name+"_"+student.last_name+".txt"
+            with open(filename, 'r') as f:
+                lines = f.readlines()
+                num_of_trees = len([l for l in lines if l.strip(' \n') != ''])
+                farm_packet = net.Packet()
+                farm_packet.write(const.packet_load_farm)
+                farm_packet.write(num_of_trees)
+                with open(filename) as file:
+                    for line in file:
+                        values = line.split()
+                        farm_packet.write(values[0])
+                        farm_packet.write(values[1])
+                        farm_packet.write(values[2])
+                self.server.send(client_id, farm_packet)
             
     def on_connect(self, client_id):
         pass
-    
-    def send_farm(self, user):
-        filename = "content/farms/"+user.first_name+"_"+user.last_name+".txt"
-        with open(filename, 'r') as f:
-            lines = f.readlines()
-            num_of_trees = len([l for l in lines if l.strip(' \n') != ''])
-        packet = net.Packet()
-        packet.write(const.packet_load_farm)
-        packet.write(num_of_trees)
-        with open(filename) as file:
-            for line in file:
-                values = line.split()
-                packet.write(values[0])
-                packet.write(values[1])
-                packet.write(values[2])
-        self.server.send(user.client_id, packet)
-    
-    def draw(self, target):
-        for item in self.land_items:
-            item.draw(target)
-            
+        
     def update(self, dt):
         pass
     

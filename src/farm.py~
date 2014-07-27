@@ -59,7 +59,7 @@ class FarmClient:
                 pos_x = int(packet.read())
                 pos_y = int(packet.read())
                 item = FarmLandItem(item_id, sf.Vector2(pos_x, pos_y))
-                self.student.farm_interface.land_items.append(item)
+                self.land_items.append(item)
             
     def update(self, dt):
         self.input.handle()
@@ -141,7 +141,7 @@ class FarmServer:
                 pos_y = packet.read()
                 line = [str(type), " ", str(pos_x), " ", str(pos_y), "\n"]
                 file.writelines(line)
-            print("Saved")
+            print("Server Saved")
             file.close()
         elif packet_id == const.packet_request_place_item:
             # Read incoming packet
@@ -155,9 +155,6 @@ class FarmServer:
             item_packet.write(pos_x)
             item_packet.write(pos_y)
             self.server.send(client_id, item_packet)
-            # Draw this tree 
-            item = FarmLandItem(item_id, sf.Vector2(pos_x, pos_y))
-            self.land_items.append(item)
         elif packet_id == const.packet_request_load_farm:
             farm_owner_id = packet.read()
             student = self.users[farm_owner_id]

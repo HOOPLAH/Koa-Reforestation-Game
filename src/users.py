@@ -31,7 +31,7 @@ class Teacher:
         self.first_name = ""
         self.last_name = ""
         self.server = server
-        self.farm_interface = farm_interfacew
+        self.farm_interface = farm_interface
         
     def serialize(self, packet):
         packet.write("Teacher")

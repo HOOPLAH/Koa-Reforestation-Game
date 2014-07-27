@@ -44,8 +44,8 @@ try:
                 if user_type == "Student":
                     student = Student(client.client_id)
                     student.deserialize(packet)
-                    student.farm_interface = FarmInterface(client, student, input_sys)
                     student.farm = FarmClient(client, student, input_sys)
+                    student.farm_interface = FarmInterface(client, student, student.farm, input_sys)
                     # request farm for student
                     new_packet = net.Packet()
                     new_packet.write(const.packet_request_load_farm)

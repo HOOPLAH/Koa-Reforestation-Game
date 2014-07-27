@@ -11,19 +11,19 @@ keys = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o
 
 # FarmInterface draws all the buttons and the farm currently on-screen
 class FarmInterface:
-    def __init__(self, client, student, input):
+    def __init__(self, client, student, farm, input):
         self.client = client
         self.student = student
         self.input = input
         self.input.add_mouse_handler(self)
+        self.input.add_key_handler(self)
         
         self.test_button = Button(0, 0, "button", 3, 3, input)
         
         self.buttons = []
         self.buttons.append(self.test_button)
         
-        self.land_items = []
-        self.current_farm = None # The farm we're currently drawing
+        self.current_farm = farm # The farm we're currently drawing
     
     # MOUSE
     def on_mouse_button_pressed(self, mouse_button, x, y):
@@ -53,10 +53,11 @@ class FarmInterface:
                 # Save user information
                 packet = net.Packet()
                 packet.write(const.packet_save)
-                self.user.serialize(packet)
+                self.student.serialize(packet)
                 # Save farm information
-                packet.write(len(self.user.farm.land_items))
-                for item in self.user.farm.land_items:
+                packet.write(len(self.current_farm.farm.land_items))
+                print(len(self.current_farm.farm.land_items))
+                for item in self.land_items:
                     item.serialize(packet)
                 # Send file
                 self.client.send(packet)
@@ -73,5 +74,5 @@ class FarmInterface:
         for button in self.buttons:
             button.draw(target)
         
-        for item in self.land_items:
+        for item in self.current_farm.land_items:
             item.draw(target)

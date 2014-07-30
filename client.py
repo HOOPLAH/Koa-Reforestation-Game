@@ -17,7 +17,7 @@ input_sys = InputSystem(window)
 
 try:
     # Create the frame rate text
-    frame_rate = sf.Text("0", res.font_8bit, 20)
+    frame_rate = sf.Text("0", res.font_farmville, 20)
 
     # Connect to server
     client = net.Client("localhost", 30000)

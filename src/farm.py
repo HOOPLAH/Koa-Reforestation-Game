@@ -141,7 +141,6 @@ class FarmServer:
                 pos_y = packet.read()
                 line = [str(type), " ", str(pos_x), " ", str(pos_y), "\n"]
                 file.writelines(line)
-            print("Server Saved")
             file.close()
         elif packet_id == const.packet_request_place_item:
             # Read incoming packet

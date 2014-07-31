@@ -5,10 +5,9 @@ import src.res as res
 
 from src.input_system import MouseHandler
 from src.gui import Button
+from src.gui import Textbox
 from src.gui import Window
 from src.rect import contains
-
-keys = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z']
 
 # FarmInterface draws all the buttons and the farm currently on-screen
 class FarmInterface:
@@ -21,6 +20,8 @@ class FarmInterface:
         
         self.load_button = Button(sf.Vector2(0, 0), "button", 3, 3, input)
         self.save_button = Button(sf.Vector2(0, 32), "button", 3, 3, input)
+        
+        self.textbox = Textbox(sf.Vector2(300, 300), 256, input)
         
         self.window = Window(sf.Vector2(0, 0), 256, 256, sf.Color(50, 50, 120, 255), input)
         self.window.add_child(self.load_button)
@@ -88,6 +89,7 @@ class FarmInterface:
         target.draw(points)
         
         self.window.draw(target)
+        self.textbox.draw(target)
         
         for item in self.current_farm.land_items:
             item.draw(target)

@@ -10,3 +10,4 @@ font_farmville = sf.Font.from_file("content/fonts/farmville.ttf")
 textures = {}
 textures["tree"] = sf.Texture.from_file("content/textures/tree.png")
 textures["button"] = sf.Texture.from_file("content/gui/button.png")
+textures["textbox"] = sf.Texture.from_file("content/gui/textbox.png")

@@ -63,6 +63,7 @@ class FarmClient:
             
     def update(self, dt):
         self.input.handle()
+        self.student.farm_interface.update(dt)
             
 # FarmServer controls all the farms
 class FarmServer:

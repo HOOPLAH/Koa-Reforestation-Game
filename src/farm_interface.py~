@@ -5,6 +5,7 @@ import src.res as res
 
 from src.input_system import MouseHandler
 from src.gui import Button
+from src.gui import Window
 from src.rect import contains
 
 keys = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z']
@@ -21,17 +22,17 @@ class FarmInterface:
         self.load_button = Button(sf.Vector2(0, 0), "button", 3, 3, input)
         self.save_button = Button(sf.Vector2(0, 32), "button", 3, 3, input)
         
-        self.buttons = []
-        self.buttons.append(self.test_button)
-        self.buttons.append(self.save_button)
+        self.window = Window(sf.Vector2(300, 300), 256, 256, sf.Color(50, 50, 120, 255), input)
+        self.window.add_child(self.load_button)
+        self.window.add_child(self.save_button)
         
         self.current_farm = farm # The farm we're currently drawing
         
     def mouse_over_buttons(self, x, y): # Hack so the buttons work together
         i = 0 # the amount of buttons not pressed
         button_pressed = False
-        while (i < len(self.buttons)) and button_pressed == False:
-            if contains(self.buttons[i].rectangle, sf.Vector2(x, y)) == False:
+        while (i < len(self.window.children)) and button_pressed == False:
+            if contains(self.window.vertices.bounds, sf.Vector2(x, y)) == False:
                 i+=1
             else:
                 button_pressed = True
@@ -50,12 +51,12 @@ class FarmInterface:
             
     def on_mouse_button_released(self, button, x, y):
         if button == sf.Mouse.LEFT:
-            if contains(self.load_button.rectangle, sf.Vector2(x, y)) and self.current_farm != self.student.farm:
+            if contains(self.load_button.local_bounds, sf.Vector2(x, y)) and self.current_farm != self.student.farm:
                 packet = net.Packet()
                 packet.write(const.packet_request_load_farm)
                 packet.write(self.student.client_id)
                 self.client.send(packet)
-            if contains(self.save_button.rectangle, sf.Vector2(x, y)):
+            if contains(self.save_button.local_bounds, sf.Vector2(x, y)):
                 # Save user information
                 packet = net.Packet()
                 packet.write(const.packet_save)
@@ -76,6 +77,9 @@ class FarmInterface:
     
     def on_key_released(self, key_code):
         pass
+        
+    def update(self, dt):
+        self.window.update(dt)
             
     def draw(self, target):
         points = sf.Text("0", res.font_8bit, 20)
@@ -83,8 +87,7 @@ class FarmInterface:
         points.string = str(self.student.points)
         target.draw(points)
         
-        for button in self.buttons:
-            button.draw(target)
+        self.window.draw(target)
         
         for item in self.current_farm.land_items:
             item.draw(target)

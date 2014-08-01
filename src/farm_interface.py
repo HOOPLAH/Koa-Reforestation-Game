@@ -21,11 +21,12 @@ class FarmInterface:
         self.load_button = Button(sf.Vector2(0, 0), "button", 3, 3, input)
         self.save_button = Button(sf.Vector2(0, 32), "button", 3, 3, input)
         
-        self.textbox = Textbox(sf.Vector2(300, 300), 256, input)
+        self.textbox = Textbox(sf.Vector2(0, 64), 256, input)
         
         self.window = Window(sf.Vector2(0, 0), 256, 256, sf.Color(50, 50, 120, 255), input)
         self.window.add_child(self.load_button)
         self.window.add_child(self.save_button)
+        self.window.add_child(self.textbox)
         
         self.current_farm = farm # The farm we're currently drawing
         

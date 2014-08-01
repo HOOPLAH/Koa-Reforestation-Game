@@ -46,7 +46,8 @@ class Button(Element):
         super().__init__(pos, type, frames, frames_per_row, input)
         
     def on_mouse_button_pressed(self, mouse_button, x, y):
-        self.sprite.set_frame(2) # down
+        if contains(self.sprite.local_bounds, sf.Vector2(x, y)):
+            self.sprite.set_frame(2) # down
     
     def on_mouse_button_released(self, button, x, y):
         self.sprite.set_frame(0) # up
@@ -62,23 +63,26 @@ class Textbox(Element):
         super().__init__(pos, "textbox", 1, 1, input)
         self.sprite.scale(sf.Vector2(width/self.sprite.texture.width, 1))
         
-        self.local_bounds = self.sprite.local_bounds
+        self.text_offset = sf.Vector2(7, 3)
+        self.local_bounds = sf.Rectangle(pos, sf.Vector2(width, self.sprite.texture.height))
         
         self.typing = False
-        self.text = sf.Text("l", res.font_farmville, 20)
+        self.text = sf.Text("", res.font_farmville, 20)
+        self.text.position = self.local_bounds.position
+        self.text.color = sf.Color.BLACK
         
         input.add_text_handler(self)
         
     def on_text_entered(self, unicode):
-        if unicode != 8:
-            self.text += unicode;
+        if unicode != 8 and self.typing is True: # not backspace
+            self.text.string += chr(unicode);
         
     def on_mouse_button_pressed(self, mouse_button, x, y):
         if contains(self.local_bounds, sf.Vector2(x, y)):
             self.typing = True
     
     def on_mouse_button_released(self, button, x, y):
-        self.typing = True
+        pass
         
     def on_mouse_moved(self, position, move):
         pass
@@ -88,7 +92,8 @@ class Textbox(Element):
         target.draw(self.text)
         
     def update(self, dt):
-        pass
+        if self.text.position != (self.local_bounds.position + self.text_offset):
+            self.text.position = (self.local_bounds.position + self.text_offset)
 
 class Window():
     def __init__(self, pos, width, height, color, input):

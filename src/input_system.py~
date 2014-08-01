@@ -57,7 +57,8 @@ class InputSystem:
                 elif event.released:
                     for handler in self.key_handlers:
                         handler.on_key_released(event.code)
-            elif event.type is sf.TextEnteredEvent:
+            # Typing event
+            elif type(event) is sf.TextEvent:
                 for handler in self.text_handlers:
                     handler.on_text_entered(event.unicode)
             # Mouse button event

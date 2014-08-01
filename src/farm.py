@@ -63,7 +63,10 @@ class FarmClient:
             
     def update(self, dt):
         self.input.handle()
-        self.student.farm_interface.update(dt)
+        self.student.interface.update(dt)
+        
+    def draw(self, target):
+        self.student.farm_interface.draw(target)
             
 # FarmServer controls all the farms
 class FarmServer:
@@ -112,7 +115,7 @@ class FarmServer:
                                 self.users[new_teacher.client_id].serialize(confirm_login_packet)
                                 self.server.send(client_id, confirm_login_packet)
             else:
-                message = "User \'"+self.students[client_id].first_name+" "+self.students[client_id].last_name+"\' doesn't exist"
+                message = "User \'"+self.users[client_id].first_name+" "+self.users[client_id].last_name+"\' doesn't exist"
                 # Send deny login packet
                 deny_login_packet = net.Packet()
                 deny_login_packet.write(const.packet_deny_login)

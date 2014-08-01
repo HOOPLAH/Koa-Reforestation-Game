@@ -3,20 +3,16 @@ import src.net as net
 import src.const as const
 import src.res as res
 
-from src.input_system import MouseHandler
 from src.gui import Button
 from src.gui import Textbox
 from src.gui import Window
+from src.interface import Interface
 from src.rect import contains
 
 # FarmInterface draws all the buttons and the farm currently on-screen
-class FarmInterface:
-    def __init__(self, client, student, farm, input):
-        self.client = client
-        self.student = student
-        self.input = input
-        self.input.add_mouse_handler(self)
-        self.input.add_key_handler(self)
+class FarmInterface(Interface):
+    def __init__(self, client, farm, input):
+        super().__init__(client, input)
         
         self.load_button = Button(sf.Vector2(0, 0), "button", 3, 3, input)
         self.save_button = Button(sf.Vector2(0, 32), "button", 3, 3, input)
@@ -69,16 +65,6 @@ class FarmInterface:
                     item.serialize(packet)
                 # Send file
                 self.client.send(packet)
-            
-    def on_mouse_moved(self, position, move):
-        pass
-        
-    # KEYBOARD
-    def on_key_pressed(self, key_code):
-        pass
-    
-    def on_key_released(self, key_code):
-        pass
         
     def update(self, dt):
         self.window.update(dt)

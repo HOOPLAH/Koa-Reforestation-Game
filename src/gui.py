@@ -74,18 +74,18 @@ class Textbox(Element):
         input.add_text_handler(self)
         
     def on_text_entered(self, unicode):
-        if unicode != 8 and self.typing is True: # not backspace
+        if unicode != 8 and unicode != 12 and self.typing is True: # not backspace
             self.text.string += chr(unicode);
+        elif unicode == 8: # You press backspace
+            self.text.string = self.text.string[:-1]
+        elif unicode == 12: # Enter
+            self.typing = False
         
     def on_mouse_button_pressed(self, mouse_button, x, y):
         if contains(self.local_bounds, sf.Vector2(x, y)):
             self.typing = True
-    
-    def on_mouse_button_released(self, button, x, y):
-        pass
-        
-    def on_mouse_moved(self, position, move):
-        pass
+        else:
+            self.typing = False
         
     def draw(self, target):
         super().draw(target)
@@ -130,11 +130,11 @@ class Window():
             child.position_dirty = False
         self.position_dirty = False
         
-    def remove_child(self, element):
-        self.children.remove(element)
-    
     def add_child(self, element):
         self.children.append(element)
+        
+    def remove_child(self, element):
+        self.children.remove(element)
         
     def move(self, x, y):
         self.vertices[0].position += sf.Vector2(x, y)

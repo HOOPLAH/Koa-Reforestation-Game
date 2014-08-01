@@ -2,13 +2,13 @@ import src.net as net
 import src.const as const
 
 class Student:
-    def __init__(self, id="", farm=None, farm_interface=None):
+    def __init__(self, id="", screen=None, interface=None):
         self.client_id = id
         self.points = 0
         self.first_name = ""
         self.last_name = ""
-        self.farm = farm
-        self.farm_interface = farm_interface
+        self.screen = screen # farm, shop, etc.
+        self.interface = interface
 
     def serialize(self, packet):
         packet.write("Student")
@@ -23,15 +23,14 @@ class Student:
         self.points = packet.read()
         self.first_name = packet.read()
         self.last_name = packet.read()
-        
 
 class Teacher:
-    def __init__(self, id, server, farm_interface=None):
+    def __init__(self, id, server, interface=None):
         self.client_id = id
         self.first_name = ""
         self.last_name = ""
         self.server = server
-        self.farm_interface = farm_interfacew
+        self.interface = interface
         
     def serialize(self, packet):
         packet.write("Teacher")

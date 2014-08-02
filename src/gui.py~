@@ -7,13 +7,9 @@ from src.spritesheet import SpriteSheet
 keys = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z']
 
 class Element:
-    def __init__(self, pos, type, frames, frames_per_row, input):
+    def __init__(self, pos, input):
         self.position = pos
-        self.sprite = SpriteSheet(res.textures[type])
-        self.sprite.init(frames, frames_per_row)
-        self.sprite.position = pos
-        
-        self.local_bounds = self.sprite.local_bounds
+        self.local_bounds = sf.Rectangle(pos, sf.Vector2(0, 0))
         
         self.position_dirty = True
         
@@ -34,14 +30,26 @@ class Element:
             
     def on_mouse_moved(self, position, move):
         pass
-            
-    def draw(self, target):
-        target.draw(self.sprite)
         
     def update(self, dt):
         pass
+            
+    def draw(self, target):
+        pass
 
-class Button(Element):
+class SpriteElement(Element):
+    def __init__(self, pos, type, frames, frames_per_row, input):
+        super().__init__(pos, input)
+        self.position = pos
+        self.sprite = SpriteSheet(res.textures[type])
+        self.sprite.init(frames, frames_per_row)
+        self.sprite.position = pos
+        self.local_bounds = self.sprite.local_bounds
+        
+    def draw(self, target):
+        target.draw(self.sprite)
+
+class Button(SpriteElement):
     def __init__(self, pos, type, frames, frames_per_row, input): # assumes it's all in one picture
         super().__init__(pos, type, frames, frames_per_row, input)
         
@@ -57,9 +65,12 @@ class Button(Element):
             self.sprite.set_frame(1) # hover
         else:
             self.sprite.set_frame(0) # up
+            
+    def draw(self, target):
+        super().draw(target)
 
-class Textbox(Element):
-    def __init__(self, pos, width, input):
+class Textbox(SpriteElement):
+    def __init__(self, pos, width, default_text, input):
         super().__init__(pos, "textbox", 1, 1, input)
         self.sprite.scale(sf.Vector2(width/self.sprite.texture.width, 1))
         
@@ -67,24 +78,25 @@ class Textbox(Element):
         self.local_bounds = sf.Rectangle(pos, sf.Vector2(width, self.sprite.texture.height))
         
         self.typing = False
-        self.text = sf.Text("", res.font_farmville, 20)
+        self.text = sf.Text(default_text, res.font_farmville, 20)
         self.text.position = self.local_bounds.position
         self.text.color = sf.Color.BLACK
         
         input.add_text_handler(self)
         
     def on_text_entered(self, unicode):
-        if unicode != 8 and unicode != 12 and self.typing is True: # not backspace
+        if unicode != 8 and unicode != 13 and self.typing is True: # not backspace, not enter
             self.text.string += chr(unicode);
-        elif unicode == 8: # You press backspace
+        elif unicode == 8 and self.typing is True: # You press backspace
             self.text.string = self.text.string[:-1]
-        elif unicode == 12: # Enter
+        elif unicode == 13: # Enter
             self.typing = False
         
     def on_mouse_button_pressed(self, mouse_button, x, y):
         if contains(self.local_bounds, sf.Vector2(x, y)):
             self.typing = True
-        else:
+            self.text.string = ""
+        elif not contains(self.local_bounds, sf.Vector2(x, y)):
             self.typing = False
         
     def draw(self, target):
@@ -111,7 +123,6 @@ class Window():
         
         self.children = []
         self.mouse_state = 'up'
-        self.recalculate_position()
         
         self.input = input
         input.add_mouse_handler(self)
@@ -132,6 +143,7 @@ class Window():
         
     def add_child(self, element):
         self.children.append(element)
+        self.recalculate_position()
         
     def remove_child(self, element):
         self.children.remove(element)

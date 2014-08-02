@@ -8,7 +8,6 @@ from src.users import Teacher
 from src.farm_interface import FarmInterface
 
 import os
-import re
 
 class FarmLandItem: # something placeable on the farm (ex. trees)
     def __init__(self, type, pos):
@@ -66,7 +65,7 @@ class FarmClient:
         self.student.interface.update(dt)
         
     def draw(self, target):
-        self.student.farm_interface.draw(target)
+        self.student.interface.draw(target)
             
 # FarmServer controls all the farms
 class FarmServer:
@@ -89,31 +88,30 @@ class FarmServer:
             if os.path.isfile(filename): # file exists so user exists
                 with open(filename) as file:
                     for line in file:
-                        if re.search(first_name, line):
-                            values = line.split()
-                            if values[2] == "Student":
-                                new_student = Student(client_id)
-                                new_student.first_name = first_name
-                                new_student.last_name = last_name
-                                new_student.points = values[3]
-                                self.users[client_id] = new_student
-                                # Send confirm login packet
-                                confirm_login_packet = net.Packet()
-                                confirm_login_packet.write(const.packet_confirm_login)
-                                confirm_login_packet.write("Student")
-                                new_student.serialize(confirm_login_packet)
-                                self.server.send(client_id, confirm_login_packet)
-                            elif values[2] == "Teacher":
-                                new_teacher = Teacher(client_id, self.server)
-                                new_teacher.first_name = first_name
-                                new_teacher.last_name = last_name
-                                self.users[client_id] = new_teacher
-                                # Send confirm login packet
-                                confirm_login_packet = net.Packet()
-                                confirm_login_packet.write(const.packet_confirm_login)
-                                confirm_login_packet.write("Teacher")
-                                self.users[new_teacher.client_id].serialize(confirm_login_packet)
-                                self.server.send(client_id, confirm_login_packet)
+                        values = line.split()
+                        if values[2] == "Student":
+                            new_student = Student(client_id, None, None)
+                            new_student.first_name = first_name
+                            new_student.last_name = last_name
+                            new_student.points = values[3]
+                            self.users[client_id] = new_student
+                            # Send confirm login packet
+                            confirm_login_packet = net.Packet()
+                            confirm_login_packet.write(const.packet_confirm_login)
+                            confirm_login_packet.write("Student")
+                            new_student.serialize(confirm_login_packet)
+                            self.server.send(client_id, confirm_login_packet)
+                        elif values[2] == "Teacher":
+                            new_teacher = Teacher(client_id, self.server)
+                            new_teacher.first_name = first_name
+                            new_teacher.last_name = last_name
+                            self.users[client_id] = new_teacher
+                            # Send confirm login packet
+                            confirm_login_packet = net.Packet()
+                            confirm_login_packet.write(const.packet_confirm_login)
+                            confirm_login_packet.write("Teacher")
+                            self.users[new_teacher.client_id].serialize(confirm_login_packet)
+                            self.server.send(client_id, confirm_login_packet)
             else:
                 message = "User \'"+self.users[client_id].first_name+" "+self.users[client_id].last_name+"\' doesn't exist"
                 # Send deny login packet

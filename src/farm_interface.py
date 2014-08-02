@@ -11,13 +11,13 @@ from src.rect import contains
 
 # FarmInterface draws all the buttons and the farm currently on-screen
 class FarmInterface(Interface):
-    def __init__(self, client, farm, input):
-        super().__init__(client, input)
+    def __init__(self, client, student, farm, input):
+        super().__init__(client, student, input)
         
         self.load_button = Button(sf.Vector2(0, 0), "button", 3, 3, input)
         self.save_button = Button(sf.Vector2(0, 32), "button", 3, 3, input)
         
-        self.textbox = Textbox(sf.Vector2(0, 64), 256, input)
+        self.textbox = Textbox(sf.Vector2(0, 64), 256, "test", input)
         
         self.window = Window(sf.Vector2(0, 0), 256, 256, sf.Color(50, 50, 120, 255), input)
         self.window.add_child(self.load_button)
@@ -70,13 +70,7 @@ class FarmInterface(Interface):
         self.window.update(dt)
             
     def draw(self, target):
-        points = sf.Text("0", res.font_8bit, 20)
-        points.position = sf.Vector2(760, 0)
-        points.string = str(self.student.points)
-        target.draw(points)
-        
         self.window.draw(target)
-        self.textbox.draw(target)
         
         for item in self.current_farm.land_items:
             item.draw(target)

@@ -40,10 +40,10 @@ while not logged_in and window.is_open:
         if packet_id == const.packet_confirm_login:
             user_type = packet.read()
             if user_type == "Student":
-                user = Student(client.client_id)
+                user = Student(client.client_id, None, None)
                 user.deserialize(packet)
-                user.farm = FarmClient(client, user, input_sys)
-                user.interface = FarmInterface(client, user.farm, input_sys)
+                user.state = FarmClient(client, user, input_sys)
+                user.interface = FarmInterface(client, user.state, input_sys)
                 # request farm for student
                 new_packet = net.Packet()
                 new_packet.write(const.packet_request_load_farm)
@@ -77,11 +77,11 @@ while window.is_open:
     # Update connection
     client.update()
     
-    user.farm.update(dt)
+    user.state.update(dt)
     
     # DRAW
     window.clear(sf.Color(120, 120, 120)) # clear screen
     window.draw(frame_rate)
     if logged_in:
-        user.farm.draw(window)
+        user.state.draw(window)
     window.display() # update the window

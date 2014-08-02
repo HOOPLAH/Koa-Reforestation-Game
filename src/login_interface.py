@@ -11,12 +11,12 @@ from src.rect import contains
 
 class LoginInterface(Interface):
     def __init__(self, client, input):
-        super().__init__(client, input)
+        super().__init__(client, None, input)
         
-        self.first_textbox = Textbox(sf.Vector2(272, 142), 256, input)
-        self.last_textbox = Textbox(sf.Vector2(272, 174), 256, input)
-        self.login_button = Button(sf.Vector2(304, 206), "button", 3, 3, input)
-        
+        self.first_textbox = Textbox(sf.Vector2(0, 20), 256, "lucas", input)
+        self.last_textbox = Textbox(sf.Vector2(0, 52), 256, "derego", input)
+        self.login_button = Button(sf.Vector2(124-48, 102), "button", 3, 3, input)
+
         self.window = Window(sf.Vector2(272, 112), 256, 64, sf.Color(50, 50, 120, 255), input)
         self.window.add_child(self.login_button)
         self.window.add_child(self.first_textbox)

@@ -1,6 +1,7 @@
 class Interface:
-    def __init__(self, client, input):
+    def __init__(self, client, student, input):
         self.client = client
+        self.student = student
         input.add_key_handler(self)
         input.add_text_handler(self)
         input.add_mouse_handler(self)
@@ -30,4 +31,7 @@ class Interface:
         pass
         
     def draw(self, target):
-        pass
+        points = sf.Text("0", res.font_8bit, 20)
+        points.position = sf.Vector2(760, 0)
+        points.string = str(self.student.points)
+        target.draw(points)

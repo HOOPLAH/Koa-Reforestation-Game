@@ -78,6 +78,7 @@ class Textbox(SpriteElement):
         self.local_bounds = sf.Rectangle(pos, sf.Vector2(width, self.sprite.texture.height))
         
         self.typing = False
+        self.overlapping = False # if the text goes out the textbox
         self.default_text = default_text
         self.text = sf.Text(default_text, res.font_farmville, 20)
         self.text.position = self.local_bounds.position
@@ -86,10 +87,12 @@ class Textbox(SpriteElement):
         input.add_text_handler(self)
         
     def on_text_entered(self, unicode):
-        if unicode != 8 and unicode != 13 and self.typing is True: # not backspace, not enter
+        if unicode != 8 and unicode != 13 and self.typing is True and not self.overlapping: # not backspace, not enter
             self.text.string += chr(unicode);
         elif unicode == 8 and self.typing is True: # You press backspace
             self.text.string = self.text.string[:-1]
+            if self.overlapping:
+                self.overlapping = False
         elif unicode == 13: # Enter
             self.typing = False
         
@@ -110,6 +113,9 @@ class Textbox(SpriteElement):
     def update(self, dt):
         if self.text.position != (self.local_bounds.position + self.text_offset):
             self.text.position = (self.local_bounds.position + self.text_offset)
+            
+        if self.text.local_bounds.width+self.text_offset.x+17 > self.local_bounds.width:
+            self.overlapping = True
 
 class Window():
     def __init__(self, pos, width, height, color, input):

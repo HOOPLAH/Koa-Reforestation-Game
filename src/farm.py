@@ -3,6 +3,9 @@ import src.net as net
 import src.res as res
 import src.const as const
 
+from src.state import StateClient
+from src.state import StateServer
+
 from src.users import Student
 from src.users import Teacher
 from src.farm_interface import FarmInterface
@@ -14,6 +17,7 @@ class FarmLandItem: # something placeable on the farm (ex. trees)
         self.type = type
         self.sprite = sf.Sprite(res.textures[type])
         self.sprite.position = pos
+        self.local_bounds = self.sprite.local_bounds
         self.position = pos
         
     def serialize(self, packet):
@@ -30,22 +34,17 @@ class FarmLandItem: # something placeable on the farm (ex. trees)
         target.draw(self.sprite)
 
 # FarmClient is the client's farm, FarmInterface is the farm on the screen
-class FarmClient:
+class FarmClient(StateClient):
     def __init__(self, client, student, input):
-        self.input = input
-        self.client = client
-        self.student = student # the owner of the farm
-        
-        client.add_handler(self)
+        super().__init__(client, student, input)
         
         self.land_items = []
         
     def handle_packet(self, packet):
-        packet_id = packet.read()
+        super().handle_packet(packet)
         
-        if packet_id == const.packet_add_points:
-            self.student_owner.points = packet.read()
-        elif packet_id == const.packet_place_item:
+        packet_id = packet.read()
+        if packet_id == const.packet_place_item:
             item_id = packet.read()
             pos_x = packet.read()
             pos_y = packet.read()
@@ -59,13 +58,6 @@ class FarmClient:
                 pos_y = int(packet.read())
                 item = FarmLandItem(item_id, sf.Vector2(pos_x, pos_y))
                 self.land_items.append(item)
-            
-    def update(self, dt):
-        self.input.handle()
-        self.student.interface.update(dt)
-        
-    def draw(self, target):
-        self.student.interface.draw(target)
             
 # FarmServer controls all the farms
 class FarmServer:
@@ -90,7 +82,7 @@ class FarmServer:
                     for line in file:
                         values = line.split()
                         if values[2] == "Student":
-                            new_student = Student(client_id, None, None)
+                            new_student = Student(client_id)
                             new_student.first_name = first_name
                             new_student.last_name = last_name
                             new_student.points = values[3]

@@ -2,12 +2,13 @@ import src.net as net
 import src.const as const
 
 class Student:
-    def __init__(self, id, state, interface):
+    def __init__(self, id, state=None, farm=None, interface=None):
         self.client_id = id
         self.points = 0
         self.first_name = ""
         self.last_name = ""
         self.state = state # farm, shop, etc.
+        self.farm = farm
         self.interface = interface
 
     def serialize(self, packet):

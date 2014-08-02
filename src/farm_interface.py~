@@ -39,16 +39,23 @@ class FarmInterface(Interface):
     
     # MOUSE
     def on_mouse_button_pressed(self, mouse_button, x, y):
-        if not self.mouse_over_buttons(x, y):
-            packet = net.Packet()
-            packet.write(const.packet_request_place_item)
-            packet.write("tree")
-            packet.write(x)
-            packet.write(y)
-            self.client.send(packet)
+        if mouse_button == sf.Mouse.LEFT:
+            if not self.mouse_over_buttons(x, y):
+                packet = net.Packet()
+                packet.write(const.packet_request_place_item)
+                packet.write("tree")
+                packet.write(x)
+                packet.write(y)
+                self.client.send(packet)
+                
+        if mouse_button == sf.Mouse.RIGHT:
+            for item in self.current_farm.land_items:
+                print("DELETE")
+                if contains(item.local_bounds, sf.Vector2(x, y)):
+                    self.current_farm.land_items.remove(item)
             
-    def on_mouse_button_released(self, button, x, y):
-        if button == sf.Mouse.LEFT:
+    def on_mouse_button_released(self, mouse_button, x, y):
+        if mouse_button == sf.Mouse.LEFT:
             if contains(self.load_button.local_bounds, sf.Vector2(x, y)) and self.current_farm != self.student.farm:
                 packet = net.Packet()
                 packet.write(const.packet_request_load_farm)

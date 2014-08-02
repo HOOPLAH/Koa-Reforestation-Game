@@ -12,7 +12,7 @@ from src.input_system import InputSystem
 
 # create the main window
 window = sf.RenderWindow(sf.VideoMode(800, 480), "Koa Reforestation Client")
-window.key_repeat_enabled = False
+window.key_repeat_enabled = True
 
 input_sys = InputSystem(window)
 
@@ -24,6 +24,8 @@ client = net.Client("localhost", 30000)
 
 logged_in = False
 login_interface = LoginInterface(client, input_sys)
+
+user = None
 
 while not logged_in and window.is_open:
     window.clear(sf.Color(120, 120, 120)) # clear screen
@@ -40,9 +42,11 @@ while not logged_in and window.is_open:
         if packet_id == const.packet_confirm_login:
             user_type = packet.read()
             if user_type == "Student":
-                user = Student(client.client_id, None, None)
+                user = Student(client.client_id)
                 user.deserialize(packet)
-                user.state = FarmClient(client, user, input_sys)
+                farm = FarmClient(client, user, input_sys)
+                user.state = farm
+                user.farm = farm
                 user.interface = FarmInterface(client, user, user.state, input_sys)
                 # request farm for student
                 new_packet = net.Packet()
@@ -76,12 +80,10 @@ while window.is_open:
 
     # Update connection
     client.update()
-    
     user.state.update(dt)
     
     # DRAW
     window.clear(sf.Color(120, 120, 120)) # clear screen
     window.draw(frame_rate)
-    if logged_in:
-        user.state.draw(window)
+    user.state.draw(window)
     window.display() # update the window

@@ -40,7 +40,7 @@ class Element:
 class SpriteElement(Element):
     def __init__(self, pos, type, frames, frames_per_row, input):
         super().__init__(pos, input)
-        self.position = pos
+        self.position = pos # position on window
         self.sprite = SpriteSheet(res.textures[type])
         self.sprite.init(frames, frames_per_row)
         self.sprite.position = pos
@@ -78,6 +78,7 @@ class Textbox(SpriteElement):
         self.local_bounds = sf.Rectangle(pos, sf.Vector2(width, self.sprite.texture.height))
         
         self.typing = False
+        self.default_text = default_text
         self.text = sf.Text(default_text, res.font_farmville, 20)
         self.text.position = self.local_bounds.position
         self.text.color = sf.Color.BLACK
@@ -95,9 +96,12 @@ class Textbox(SpriteElement):
     def on_mouse_button_pressed(self, mouse_button, x, y):
         if contains(self.local_bounds, sf.Vector2(x, y)):
             self.typing = True
-            self.text.string = ""
+            if self.text.string == self.default_text: # if it's the default text, get rid of it
+                self.text.string = ""
         elif not contains(self.local_bounds, sf.Vector2(x, y)):
             self.typing = False
+            if self.text.string == "": # if you unclick it and there's nothing there, make it the default text
+                self.text.string = self.default_text
         
     def draw(self, target):
         super().draw(target)

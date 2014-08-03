@@ -30,7 +30,7 @@ class FarmInterface(Interface):
         i = 0 # the amount of buttons not pressed
         button_pressed = False
         while (i < len(self.window.children)) and button_pressed == False:
-            if contains(self.window.vertices.bounds, sf.Vector2(x, y)) == False:
+            if not contains(self.window.vertices.bounds, sf.Vector2(x, y)):
                 i+=1
             else:
                 button_pressed = True
@@ -49,8 +49,7 @@ class FarmInterface(Interface):
                 self.client.send(packet)
                 
         if mouse_button == sf.Mouse.RIGHT:
-            for item in self.current_farm.land_items:
-                print("DELETE")
+            for item in reversed(self.current_farm.land_items):
                 if contains(item.local_bounds, sf.Vector2(x, y)):
                     self.current_farm.land_items.remove(item)
             

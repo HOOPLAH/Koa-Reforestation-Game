@@ -16,8 +16,8 @@ class FarmLandItem: # something placeable on the farm (ex. trees)
     def __init__(self, type, pos):
         self.type = type
         self.sprite = sf.Sprite(res.textures[type])
-        self.sprite.position = pos
-        self.local_bounds = self.sprite.local_bounds
+        self.sprite.position = pos 
+        self.local_bounds = sf.Rectangle(pos, sf.Vector2(self.sprite.texture.width, self.sprite.texture.height))
         self.position = pos
         
     def serialize(self, packet):

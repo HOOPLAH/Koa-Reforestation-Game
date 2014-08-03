@@ -54,7 +54,7 @@ class Button(SpriteElement):
         super().__init__(pos, type, frames, frames_per_row, input)
         
     def on_mouse_button_pressed(self, mouse_button, x, y):
-        if contains(self.sprite.local_bounds, sf.Vector2(x, y)):
+        if contains(self.local_bounds, sf.Vector2(x, y)):
             self.sprite.set_frame(2) # down
     
     def on_mouse_button_released(self, button, x, y):
@@ -87,7 +87,7 @@ class Textbox(SpriteElement):
         input.add_text_handler(self)
         
     def on_text_entered(self, unicode):
-        if unicode != 8 and unicode != 13 and self.typing is True and not self.overlapping: # not backspace, not enter
+        if unicode != 8 and unicode != 13 and self.typing is True and not self.overlapping: # not backspace, not enter, text still inside box
             self.text.string += chr(unicode);
         elif unicode == 8 and self.typing is True: # You press backspace
             self.text.string = self.text.string[:-1]

@@ -80,7 +80,7 @@ class Client:
             elif event.type == enet.EVENT_TYPE_RECEIVE:
                 packets.append(Packet(event.packet.data))
                 for handler in self.handlers:
-                    handler.handle_packet(Packet(event.packet.data), 0)
+                    handler.handle_packet(Packet(event.packet.data))
         return packets
 
 

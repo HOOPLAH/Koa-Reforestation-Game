@@ -58,6 +58,7 @@ while not logged_in and window.is_open:
                 user.deserialize(packet)
                 user.interface = FarmInterface(client, input_sys)
             logged_in = True
+            del login_interface
         elif packet_id == const.packet_deny_login:
             print(packet.read())
             exit(1)

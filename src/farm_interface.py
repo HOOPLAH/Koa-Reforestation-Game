@@ -3,9 +3,12 @@ import src.net as net
 import src.const as const
 import src.res as res
 
-from src.gui import Button
-from src.gui import Textbox
-from src.gui import Window
+from src.GUI.button import Button
+from src.GUI.textbox import Textbox
+from src.GUI.window import Window
+from src.GUI.messagebox import MessageBox
+from src.GUI.gui_manager import GUIManager
+
 from src.interface import Interface
 from src.rect import contains
 
@@ -24,23 +27,28 @@ class FarmInterface(Interface):
         self.window.add_child(self.save_button)
         self.window.add_child(self.textbox)
         
+        self.gui_manager.add(self.window)
+        
         self.current_farm = farm # The farm we're currently drawing
         
-    def mouse_over_buttons(self, x, y): # Hack so the buttons work together
-        i = 0 # the amount of buttons not pressed
-        button_pressed = False
-        while (i < len(self.window.children)) and button_pressed == False:
-            if not contains(self.window.vertices.bounds, sf.Vector2(x, y)):
-                i+=1
-            else:
-                button_pressed = True
-                
-        return button_pressed
+    def mouse_over_window(self, x, y): # Hack 
+        results = []
+        for i in range(0, len(self.gui_manager.children)):
+            results.append(contains(self.gui_manager.children[i].local_bounds, sf.Vector2(x, y)))
+            
+        for result in results:
+            if result is True:
+                return True
+            elif result is not True:
+                continue
+            
+        del results
+        return False
     
     # MOUSE
     def on_mouse_button_pressed(self, mouse_button, x, y):
         if mouse_button == sf.Mouse.LEFT:
-            if not self.mouse_over_buttons(x, y):
+            if not self.mouse_over_window(x, y):
                 packet = net.Packet()
                 packet.write(const.packet_request_place_item)
                 packet.write("tree")
@@ -52,6 +60,7 @@ class FarmInterface(Interface):
             for item in reversed(self.current_farm.land_items):
                 if contains(item.local_bounds, sf.Vector2(x, y)):
                     self.current_farm.land_items.remove(item)
+                    break # only delete one tree
             
     def on_mouse_button_released(self, mouse_button, x, y):
         if mouse_button == sf.Mouse.LEFT:
@@ -71,12 +80,9 @@ class FarmInterface(Interface):
                     item.serialize(packet)
                 # Send file
                 self.client.send(packet)
-        
-    def update(self, dt):
-        self.window.update(dt)
             
     def draw(self, target):
-        self.window.draw(target)
+        super().draw(target)
         
         for item in self.current_farm.land_items:
             item.draw(target)

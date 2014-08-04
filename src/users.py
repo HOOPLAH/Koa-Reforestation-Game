@@ -24,6 +24,12 @@ class Student:
         self.points = packet.read()
         self.first_name = packet.read()
         self.last_name = packet.read()
+        
+    def switch_interface(self, interface):
+        for child in self.interface.gui_manager.children:
+            self.interface.gui_manager.remove(child)
+            
+        self.interface = interface
 
 class Teacher:
     def __init__(self, id, server, state, interface):

@@ -3,9 +3,11 @@ import src.net as net
 import src.const as const
 import src.res as res
 
-from src.gui import Button
-from src.gui import Textbox
-from src.gui import Window
+from src.GUI.button import Button
+from src.GUI.textbox import Textbox
+from src.GUI.window import Window
+from src.GUI.gui_manager import GUIManager
+
 from src.interface import Interface
 from src.rect import contains
 
@@ -17,10 +19,12 @@ class LoginInterface(Interface):
         self.last_textbox = Textbox(sf.Vector2(0, 52), 256, "derego", input)
         self.login_button = Button(sf.Vector2(124-48, 102), "button", 3, 3, input)
 
-        self.window = Window(sf.Vector2(272, 112), 256, 64, sf.Color(50, 50, 120, 255), input)
+        self.window = Window(sf.Vector2(272, 112), 256, 256, sf.Color(50, 50, 120, 255), input)
         self.window.add_child(self.login_button)
         self.window.add_child(self.first_textbox)
         self.window.add_child(self.last_textbox)
+        
+        self.gui_manager.add(self.window)
             
     def on_mouse_button_released(self, button, x, y):
         if button == sf.Mouse.LEFT:
@@ -34,9 +38,3 @@ class LoginInterface(Interface):
                 packet.write(last_name)
                 self.client.send(packet)
                 self.client.update()
-                
-    def update(self, dt):
-        self.window.update(dt)
-        
-    def draw(self, target):
-        self.window.draw(target)

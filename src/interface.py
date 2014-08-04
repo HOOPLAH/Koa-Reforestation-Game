@@ -1,7 +1,12 @@
+import sfml as sf
+import src.res as res
+from src.GUI.gui_manager import GUIManager
+
 class Interface:
     def __init__(self, client, student, input):
         self.client = client
         self.student = student
+        self.gui_manager = GUIManager()
         input.add_key_handler(self)
         input.add_text_handler(self)
         input.add_mouse_handler(self)
@@ -28,10 +33,13 @@ class Interface:
         pass
         
     def update(self, dt):
-        pass
+        self.gui_manager.update(dt)
         
     def draw(self, target):
-        points = sf.Text("0", res.font_8bit, 20)
-        points.position = sf.Vector2(760, 0)
-        points.string = str(self.student.points)
-        target.draw(points)
+        if self.student != None:
+            points = sf.Text("0", res.font_8bit, 20)
+            points.position = sf.Vector2(760, 0)
+            points.string = str(self.student.points)
+            target.draw(points)
+        
+        self.gui_manager.draw(target)

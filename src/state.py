@@ -4,9 +4,8 @@ import src.const as const
 
 from src.users import Student
 from src.users import Teacher
-from src.farm_land_item import FarmLandItem
 
-import os
+import re
 
 class StateClient:
     def __init__(self, client, student, input):
@@ -31,12 +30,13 @@ class StateClient:
         self.student.points = packet.read()
         
 class StateServer:
-    def __init__(self, server):
+    def __init__(self, server, users):
         self.server = server
         
         server.add_handler(self)
         
-        self.users = {}
+        self.users = users # all registered users
+        self.connected_users = {}
     
     def handle_packet(self, packet, client_id):
         pass
@@ -52,43 +52,27 @@ class StateServer:
         # Read incoming packet and save data
         first_name = packet.read()
         last_name = packet.read()
-        # Check if user exists already
-        filename = "content/users/"+first_name+"_"+last_name+".txt"
-        if os.path.isfile(filename): # file exists so user exists
-            with open(filename) as file:
-                for line in file:
+        
+        user = self.users[first_name]
+        user.client_id = client_id
+        self.connected_users[client_id] = user
+        # Send confirm login packet
+        confirm_login_packet = net.Packet()
+        confirm_login_packet.write(const.packet_confirm_login)
+        
+        with open("content/users/all_registered_users.txt") as f:
+            for line in f:
+                if re.match(first_name, line):
                     values = line.split()
                     if values[2] == "Student":
-                        new_student = Student(client_id)
-                        new_student.first_name = first_name
-                        new_student.last_name = last_name
-                        new_student.points = values[3]
-                        self.users[client_id] = new_student
-                        # Send confirm login packet
-                        confirm_login_packet = net.Packet()
-                        confirm_login_packet.write(const.packet_confirm_login)
                         confirm_login_packet.write("Student")
-                        new_student.serialize(confirm_login_packet)
-                        self.server.send(client_id, confirm_login_packet)
                     elif values[2] == "Teacher":
-                        new_teacher = Teacher(client_id, self.server)
-                        new_teacher.first_name = first_name
-                        new_teacher.last_name = last_name
-                        self.users[client_id] = new_teacher
-                        # Send confirm login packet
-                        confirm_login_packet = net.Packet()
-                        confirm_login_packet.write(const.packet_confirm_login)
                         confirm_login_packet.write("Teacher")
-                        self.users[new_teacher.client_id].serialize(confirm_login_packet)
-                        self.server.send(client_id, confirm_login_packet)
-        else:
-            message = "User \'"+self.users[client_id].first_name+" "+self.users[client_id].last_name+"\' doesn't exist"
-            # Send deny login packet
-            deny_login_packet = net.Packet()
-            deny_login_packet.write(const.packet_deny_login)
-            deny_login_packet.write(message)
-            self.server.send(client_id, deny_login_packet)
-            
+                        
+        user.serialize(confirm_login_packet)
+        self.server.send(client_id, confirm_login_packet)
+                
+                
     def save(self, packet, client_id):
         # Read incoming packet
         save_packet = net.Packet()

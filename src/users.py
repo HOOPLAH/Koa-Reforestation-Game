@@ -32,7 +32,7 @@ class Student:
         self.interface = interface
 
 class Teacher:
-    def __init__(self, id, server, state, interface):
+    def __init__(self, id, server, state=None, interface=None):
         self.client_id = id
         self.first_name = ""
         self.last_name = ""

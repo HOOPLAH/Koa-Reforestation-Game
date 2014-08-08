@@ -14,6 +14,9 @@ class Element:
         input.add_key_handler(self)
         input.add_mouse_handler(self)
         
+    def add_child(self, element):
+        self.children.append(element)
+        
     def on_key_pressed(self, key_code):
         pass
     
@@ -42,6 +45,7 @@ class SpriteElement(Element):
         self.sprite.init(frames, frames_per_row)
         self.sprite.position = pos
         self.local_bounds = self.sprite.local_bounds
+        self.center = sf.Vector2(self.local_bounds.width/2, self.local_bounds.height/2)
         
     def update(self, dt):
         if self.sprite.position != self.local_bounds.position:

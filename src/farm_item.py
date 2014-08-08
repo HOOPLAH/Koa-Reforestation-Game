@@ -2,7 +2,7 @@ import sfml as sf
 import src.net as net
 import src.res as res
 
-class FarmLandItem: # something placeable on the farm (ex. trees)
+class FarmItem: # something placeable on the farm (ex. trees)
     def __init__(self, type, pos):
         self.type = type
         self.sprite = sf.Sprite(res.textures[type])

@@ -17,10 +17,10 @@ class FarmInterface(Interface):
     def __init__(self, client, student, farm, input):
         super().__init__(client, student, input)
         
-        self.load_button = Button(sf.Vector2(0, 0), "button", 3, 3, input)
-        self.save_button = Button(sf.Vector2(0, 32), "button", 3, 3, input)
+        self.load_button = Button(sf.Vector2(0, 0), "button", input, "load")
+        self.save_button = Button(sf.Vector2(0, 32), "button", input, "save")
         
-        self.textbox = Textbox(sf.Vector2(0, 64), 256, "test", input)
+        self.textbox = Textbox(sf.Vector2(0, 64), 256, "find user", input)
         
         self.window = Window(sf.Vector2(0, 0), 256, 256, sf.Color(50, 50, 120, 255), input)
         self.window.add_child(self.load_button)
@@ -32,17 +32,12 @@ class FarmInterface(Interface):
         self.current_farm = farm # The farm we're currently drawing
         
     def mouse_over_window(self, x, y): # Hack 
-        results = []
         for i in range(0, len(self.gui_manager.children)):
-            results.append(contains(self.gui_manager.children[i].local_bounds, sf.Vector2(x, y)))
-            
-        for result in results:
-            if result is True:
+            if contains(self.gui_manager.children[i].local_bounds, sf.Vector2(x, y)):
                 return True
-            elif result is not True:
+            else:
                 continue
             
-        del results
         return False
     
     # MOUSE
@@ -64,10 +59,10 @@ class FarmInterface(Interface):
             
     def on_mouse_button_released(self, mouse_button, x, y):
         if mouse_button == sf.Mouse.LEFT:
-            if contains(self.load_button.local_bounds, sf.Vector2(x, y)) and self.current_farm != self.student.farm:
+            if contains(self.load_button.local_bounds, sf.Vector2(x, y)):
                 packet = net.Packet()
                 packet.write(const.packet_request_load_farm)
-                packet.write(self.student.client_id)
+                packet.write(self.textbox.text.string) # send the name 
                 self.client.send(packet)
             if contains(self.save_button.local_bounds, sf.Vector2(x, y)):
                 # Save user information

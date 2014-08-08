@@ -6,7 +6,7 @@ class Label(Element):
     def __init__(self, pos, text, input):
         super().__init__(pos, input)
         self.text = sf.Text(text, res.font_farmville, 20)
-        self.text.position = pos
+        self.text.color = sf.Color.BLACK
         self.local_bounds = self.text.local_bounds
         
     def update(self, dt):

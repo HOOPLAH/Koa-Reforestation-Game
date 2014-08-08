@@ -6,15 +6,16 @@ from src.rect import contains
 class Window(Element):
     def __init__(self, pos, width, height, color, input):
         super().__init__(pos, input)
-        self.vertices = sf.VertexArray(sf.PrimitiveType.QUADS, 4)
         self.width = width
         self.height = height
-        # Set Position
+        self.center = sf.Vector2(width/2, height/2)
+        
+        self.vertices = sf.VertexArray(sf.PrimitiveType.QUADS, 4)
         self.vertices[0].position = sf.Vector2(pos.x, pos.y)
         self.vertices[1].position = sf.Vector2(pos.x+self.width, pos.y)
         self.vertices[2].position = sf.Vector2(pos.x+self.width, pos.y+self.height)
         self.vertices[3].position = sf.Vector2(pos.x, pos.y+self.height)
-        # Set Color
+        
         for i in range(0, 4):
             self.vertices[i].color = color
             
@@ -42,7 +43,7 @@ class Window(Element):
         
     def remove_child(self, element):
         self.children.remove(element)
-        #del element
+        del element
         
     def move(self, x, y):
         self.vertices[0].position += sf.Vector2(x, y)

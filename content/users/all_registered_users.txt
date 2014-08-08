@@ -1,0 +1,3 @@
+lucas derego Student
+marybeth derego Student
+joel truesdell Teacher

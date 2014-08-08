@@ -17,7 +17,7 @@ class LoginInterface(Interface):
         
         self.first_textbox = Textbox(sf.Vector2(0, 20), 256, "lucas", input)
         self.last_textbox = Textbox(sf.Vector2(0, 52), 256, "derego", input)
-        self.login_button = Button(sf.Vector2(124-48, 102), "button", 3, 3, input)
+        self.login_button = Button(sf.Vector2(124-48, 102), "button", input, "login")
 
         self.window = Window(sf.Vector2(272, 112), 256, 256, sf.Color(50, 50, 120, 255), input)
         self.window.add_child(self.login_button)

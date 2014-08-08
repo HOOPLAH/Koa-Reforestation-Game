@@ -6,7 +6,7 @@ import src.const as const
 from src.users import Student
 from src.users import Teacher
 from src.login_interface import LoginInterface
-from src.farm import FarmClient
+from src.farm_state import ClientFarmState
 from src.farm_interface import FarmInterface
 from src.input_system import InputSystem
 
@@ -44,14 +44,15 @@ while not logged_in and window.is_open:
             if user_type == "Student":
                 user = Student(client.client_id)
                 user.deserialize(packet)
-                farm = FarmClient(client, user, input_sys)
+                farm = ClientFarmState(client, user, input_sys)
                 user.state = farm
                 user.farm = farm
                 user.interface = FarmInterface(client, user, user.state, input_sys)
                 # request farm for student
                 new_packet = net.Packet()
                 new_packet.write(const.packet_request_load_farm)
-                new_packet.write(client.client_id)
+                name = user.first_name+" "+user.last_name
+                new_packet.write(name)
                 client.send(new_packet)
             elif user_type == "Teacher":
                 user = Teacher(client.client_id)
@@ -59,9 +60,6 @@ while not logged_in and window.is_open:
                 user.interface = FarmInterface(client, input_sys)
             logged_in = True
             del login_interface
-        elif packet_id == const.packet_deny_login:
-            print(packet.read())
-            exit(1)
 
 clock = sf.Clock()
 frame_accum = 0

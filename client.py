@@ -83,6 +83,6 @@ while window.is_open:
     
     # DRAW
     window.clear(sf.Color(120, 120, 120)) # clear screen
-    window.draw(frame_rate)
     user.state.draw(window)
+    window.draw(frame_rate)
     window.display() # update the window

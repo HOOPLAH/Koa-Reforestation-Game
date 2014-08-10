@@ -50,10 +50,10 @@ class StateServer:
     # Functions to shorten handle_packet()
     def login(self, packet, client_id):
         # Read incoming packet and save data
-        first_name = packet.read()
-        last_name = packet.read()
+        f_name = packet.read()
+        l_name = packet.read()
         
-        user = self.users[first_name]
+        user = self.users[f_name]
         user.client_id = client_id
         self.connected_users[client_id] = user
         # Send confirm login packet
@@ -62,16 +62,20 @@ class StateServer:
         
         with open("content/users/all_registered_users.txt") as f:
             for line in f:
-                if re.match(first_name, line):
+                if re.match(f_name, line):
                     values = line.split()
                     if values[2] == "Student":
                         confirm_login_packet.write("Student")
                     elif values[2] == "Teacher":
                         confirm_login_packet.write("Teacher")
                         
+        with open("content/users/"+f_name+"_"+l_name+".txt") as f:
+            for line in f:
+                values = line.split()
+                user.points = values[3]
+                        
         user.serialize(confirm_login_packet)
         self.server.send(client_id, confirm_login_packet)
-                
                 
     def save(self, packet, client_id):
         # Read incoming packet

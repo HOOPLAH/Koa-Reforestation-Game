@@ -22,7 +22,7 @@ class FarmInterface(Interface):
         
         self.textbox = Textbox(sf.Vector2(0, 64), 256, "find user", input)
         
-        self.window = Window(sf.Vector2(0, 0), 256, 256, sf.Color(50, 50, 120, 255), input)
+        self.window = Window(sf.Vector2(0, 0), 256, 128, sf.Color(50, 50, 120, 255), input)
         self.window.add_child(self.load_button)
         self.window.add_child(self.save_button)
         self.window.add_child(self.textbox)
@@ -30,34 +30,27 @@ class FarmInterface(Interface):
         self.gui_manager.add(self.window)
         
         self.current_farm = farm # The farm we're currently drawing
-        
-    def mouse_over_window(self, x, y): # Hack 
-        for i in range(0, len(self.gui_manager.children)):
-            if contains(self.gui_manager.children[i].local_bounds, sf.Vector2(x, y)):
-                return True
-            else:
-                continue
-            
-        return False
     
     # MOUSE
-    def on_mouse_button_pressed(self, mouse_button, x, y):
+    def on_mouse_button_released(self, mouse_button, x, y):
+        super().on_mouse_button_released(mouse_button, x, y)
+        
         if mouse_button == sf.Mouse.LEFT:
             if not self.mouse_over_window(x, y):
                 packet = net.Packet()
                 packet.write(const.packet_request_place_item)
                 packet.write("tree")
-                packet.write(x)
-                packet.write(y)
+                packet.write(self.input.window.map_pixel_to_coords(sf.Vector2(x, y), self.view).x)
+                packet.write(self.input.window.map_pixel_to_coords(sf.Vector2(x, y), self.view).y)
+                
                 self.client.send(packet)
                 
         if mouse_button == sf.Mouse.RIGHT:
             for item in reversed(self.current_farm.land_items):
-                if contains(item.local_bounds, sf.Vector2(x, y)):
+                if contains(item.local_bounds, self.input.window.map_pixel_to_coords(sf.Vector2(x, y), self.view)):
                     self.current_farm.land_items.remove(item)
                     break # only delete one tree
-            
-    def on_mouse_button_released(self, mouse_button, x, y):
+        
         if mouse_button == sf.Mouse.LEFT:
             if contains(self.load_button.local_bounds, sf.Vector2(x, y)):
                 packet = net.Packet()
@@ -75,9 +68,17 @@ class FarmInterface(Interface):
                     item.serialize(packet)
                 # Send file
                 self.client.send(packet)
+                
+    def on_mouse_moved(self, position, move):
+        if not self.mouse_over_window(position.x, position.y):
+            if self.mouse_state == 'down': # mouse is down
+                self.view.move(-move.x, -move.y)
             
     def draw(self, target):
-        super().draw(target)
+        target.view = self.view
         
         for item in self.current_farm.land_items:
             item.draw(target)
+            
+        target.view = target.default_view
+        super().draw(target)

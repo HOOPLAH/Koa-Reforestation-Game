@@ -48,8 +48,7 @@ class SpriteElement(Element):
         self.center = sf.Vector2(self.local_bounds.width/2, self.local_bounds.height/2)
         
     def update(self, dt):
-        if self.sprite.position != self.local_bounds.position:
-            self.sprite.position = self.local_bounds.position
+        self.sprite.position = self.local_bounds.position
         
     def draw(self, target):
         target.draw(self.sprite)

@@ -5,11 +5,13 @@ class Student:
     def __init__(self, id, state=None, farm=None, interface=None):
         self.client_id = id
         self.points = 0
+        self.user_type = "Student"
         self.first_name = ""
         self.last_name = ""
         self.state = state # farm, shop, etc.
         self.farm = farm
         self.interface = interface
+        self.inventory = []
 
     def serialize(self, packet):
         packet.write("Student")
@@ -32,12 +34,14 @@ class Student:
         self.interface = interface
 
 class Teacher:
-    def __init__(self, id, server, state=None, interface=None):
+    def __init__(self, id, server, state=None, farm=None, interface=None):
         self.client_id = id
+        self.user_type = "Teacher"
         self.first_name = ""
         self.last_name = ""
         self.server = server
         self.state = state
+        self.farm = farm
         self.interface = interface
         
     def serialize(self, packet):

@@ -7,9 +7,9 @@ from src.GUI.gui_manager import GUIManager
 keys = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z']
 
 class Interface:
-    def __init__(self, client, student, input):
+    def __init__(self, client, user, input):
         self.client = client
-        self.student = student
+        self.user = user
         self.gui_manager = GUIManager()
         self.input = input
         input.add_key_handler(self)
@@ -17,7 +17,7 @@ class Interface:
         input.add_mouse_handler(self)
         
         self.points = Label(sf.Vector2(0, 0), "", input)
-        if self.student != None:
+        if self.user and self.user.user_type is "Student":
             self.points.text.string = str(self.student.points)
             self.points.local_bounds.position.x = 800-self.points.local_bounds.width
             

@@ -36,9 +36,11 @@ class Window(Element):
             child.position_dirty = False
         self.position_dirty = False
         
-    def add_child(self, element):
+    def add_child(self, element, center=False):
         self.children.append(element)
         element.parent = self
+        if center is True:
+            self.center_child(element)
         self.recalculate_position()
         
     def remove_child(self, element):

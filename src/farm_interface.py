@@ -6,7 +6,6 @@ import src.res as res
 from src.GUI.button import Button
 from src.GUI.textbox import Textbox
 from src.GUI.window import Window
-from src.GUI.messagebox import MessageBox
 from src.GUI.gui_manager import GUIManager
 
 from src.interface import Interface
@@ -20,7 +19,7 @@ class FarmInterface(Interface):
         self.load_button = Button(sf.Vector2(0, 0), "button", input, "load")
         self.save_button = Button(sf.Vector2(0, 32), "button", input, "save")
         
-        self.textbox = Textbox(sf.Vector2(0, 64), 256, "find user", input)
+        self.textbox = Textbox(sf.Vector2(0, 64), 256, "find student", input)
         
         self.window = Window(sf.Vector2(0, 0), 256, 128, sf.Color(50, 50, 120, 255), input)
         self.window.add_child(self.load_button)

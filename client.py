@@ -8,6 +8,7 @@ from src.users import Teacher
 from src.login_interface import LoginInterface
 from src.farm_state import ClientFarmState
 from src.farm_interface import FarmInterface
+from src.teacher_control_panel_interface import TeacherControlPanelInterface
 from src.input_system import InputSystem
 
 # create the main window
@@ -55,9 +56,12 @@ while not logged_in and window.is_open:
                 new_packet.write(name)
                 client.send(new_packet)
             elif user_type == "Teacher":
-                user = Teacher(client.client_id)
+                user = Teacher(client.client_id, None)
                 user.deserialize(packet)
-                user.interface = FarmInterface(client, input_sys)
+                farm = ClientFarmState(client, user, input_sys)
+                user.state = farm
+                user.farm = farm
+                user.interface = TeacherControlPanelInterface(client, user, input_sys)
             logged_in = True
             del login_interface
 

@@ -27,7 +27,11 @@ class StateClient:
         
     # Functions to shorten handle_packet()
     def add_points(self, packet):
-        self.student.points = packet.read()
+        self.student.points = int(self.student.points)
+        self.student.points += int(packet.read())
+        packet = net.Packet()
+        packet.write(self.student.first_name)
+        self.client.send(packet)
         
 class StateServer:
     def __init__(self, server, users):
@@ -46,6 +50,14 @@ class StateServer:
         
     def update(self, dt):
         pass
+        
+    def add_points(self, packet):
+        name = packet.read()
+        values = name.split()
+        points = packet.read()
+        teacher = Teacher(0, self.server) # make a temporary teacher
+        print("name:", self.users[values[0]].client_id)
+        teacher.add_to_student_points(self.users[values[0]].client_id, points)
     
     # Functions to shorten handle_packet()
     def login(self, packet, client_id):
@@ -76,10 +88,21 @@ class StateServer:
                         
         user.serialize(confirm_login_packet)
         self.server.send(client_id, confirm_login_packet)
+        
+    def save_student(self, packet): # only save the student, not his farm
+        first_name = packet.read()
+        user_type = "Student"
+        points = int(self.users[first_name].points)
+        l_name = self.users[first_name].last_name
+        # Write data to text file
+        filename = "content/users/"+first_name+"_"+l_name+".txt"
+        file = open(filename, 'w')
+        text = [f_name, " ", l_name, " ", user_type, " ", str(points)]
+        file.writelines(text)
+        file.close()
                 
-    def save(self, packet, client_id):
+    def save_everything(self, packet, client_id):
         # Read incoming packet
-        save_packet = net.Packet()
         user_type = packet.read() # student or teacher?
         student_id = packet.read()
         points = packet.read()
@@ -102,3 +125,4 @@ class StateServer:
             line = [str(type), " ", str(pos_x), " ", str(pos_y), "\n"]
             file.writelines(line)
         file.close()
+        

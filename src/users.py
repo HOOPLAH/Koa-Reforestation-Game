@@ -58,14 +58,15 @@ class Teacher:
         self.last_name = packet.read()
         self.server = packet.read()
         
-    def set_student_points(self, student, points):
+    def set_student_points(self, client_id, points):
         packet = net.Packet()
         packet.write(const.packet_add_points)
         packet.write(points)
-        self.server.send(student.client_id, packet)
+        self.server.send(client_id, packet)
         
-    def add_to_student_points(self, student, points):
+    def add_to_student_points(self, client_id, points):
         packet = net.Packet()
         packet.write(const.packet_add_points)
         packet.write(points)
-        self.server.send(student.client_id, packet)
+        self.server.send(client_id, packet)
+        

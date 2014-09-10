@@ -55,12 +55,16 @@ class ServerFarmState(StateServer):
         
         if packet_id == const.packet_login:
             self.login(packet, client_id)
-        elif packet_id == const.packet_save:
-            self.save(packet, client_id)
+        elif packet_id == const.packet_save_student:
+            self.save_student(packet)
+        elif packet_id == const.packet_save_everything:
+            self.save_everything(packet, client_id)
         elif packet_id == const.packet_request_place_item:
             self.on_request_place_item(packet, client_id)
         elif packet_id == const.packet_request_load_farm:
             self.on_request_load_farm(packet, client_id)
+        elif packet_id == const.packet_add_points:
+            self.add_points(packet)
     
     # Functions to shorten handle_packet()
     def on_request_place_item(self, packet, client_id):

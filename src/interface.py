@@ -18,7 +18,7 @@ class Interface:
         
         self.points = Label(sf.Vector2(0, 0), "", input)
         if self.user and self.user.user_type is "Student":
-            self.points.text.string = str(self.student.points)
+            self.points.text.string = str(self.user.points)
             self.points.local_bounds.position.x = 800-self.points.local_bounds.width
             
         self.gui_manager.add(self.points)

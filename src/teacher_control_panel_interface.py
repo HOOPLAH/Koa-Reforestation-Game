@@ -17,7 +17,7 @@ class TeacherControlPanelInterface(Interface):
         
         self.search_window = Window(sf.Vector2(0, 0), 256, 128, sf.Color(50, 50, 120, 255), input)
         self.search_label = Label(sf.Vector2(103.5, 0), "Search", input, sf.Color.WHITE)
-        self.search_textbox = Textbox(sf.Vector2(0, 37), 256, "find student", input)
+        self.search_textbox = Textbox(sf.Vector2(0, 37), 256, "lucas derego", input)
         self.find_button = Button(sf.Vector2(124-48, 69), "button", input, "find")
         
         self.search_window.add_child(self.search_label)
@@ -48,6 +48,12 @@ class TeacherControlPanelInterface(Interface):
                 packet = net.Packet()
                 packet.write(const.packet_request_load_farm)
                 packet.write(self.search_textbox.text.string) # send the name 
+                self.client.send(packet)
+            elif contains(self.add_button.local_bounds, sf.Vector2(x, y)):
+                packet = net.Packet()
+                packet.write(const.packet_add_points)
+                packet.write(self.search_textbox.text.string) # name of student
+                packet.write(int(self.points_textbox.text.string)) # amount of points to add
                 self.client.send(packet)
                 
     def on_mouse_moved(self, position, move):

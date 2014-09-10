@@ -34,39 +34,39 @@ class FarmInterface(Interface):
     def on_mouse_button_released(self, mouse_button, x, y):
         super().on_mouse_button_released(mouse_button, x, y)
         
-        if mouse_button == sf.Mouse.LEFT:
-            if not self.mouse_over_window(x, y):
-                packet = net.Packet()
-                packet.write(const.packet_request_place_item)
-                packet.write("tree")
-                packet.write(self.input.window.map_pixel_to_coords(sf.Vector2(x, y), self.view).x)
-                packet.write(self.input.window.map_pixel_to_coords(sf.Vector2(x, y), self.view).y)
+        if self.current_farm == self.user.farm:
+            if mouse_button == sf.Mouse.LEFT:
+                if not self.mouse_over_window(x, y):
+                    packet = net.Packet()
+                    packet.write(const.packet_request_place_item)
+                    packet.write("tree")
+                    packet.write(self.input.window.map_pixel_to_coords(sf.Vector2(x, y), self.view).x)
+                    packet.write(self.input.window.map_pixel_to_coords(sf.Vector2(x, y), self.view).y)
+                    
+                    self.client.send(packet)
                 
-                self.client.send(packet)
-                
-        if mouse_button == sf.Mouse.RIGHT:
-            for item in reversed(self.current_farm.land_items):
-                if contains(item.local_bounds, self.input.window.map_pixel_to_coords(sf.Vector2(x, y), self.view)):
-                    self.current_farm.land_items.remove(item)
-                    break # only delete one tree
-        
-        if mouse_button == sf.Mouse.LEFT:
-            if contains(self.load_button.local_bounds, sf.Vector2(x, y)):
-                packet = net.Packet()
-                packet.write(const.packet_request_load_farm)
-                packet.write(self.textbox.text.string) # send the name 
-                self.client.send(packet)
-            if contains(self.save_button.local_bounds, sf.Vector2(x, y)):
-                # Save user information
-                packet = net.Packet()
-                packet.write(const.packet_save)
-                self.student.serialize(packet)
-                # Save farm information
-                packet.write(len(self.current_farm.land_items))
-                for item in self.current_farm.land_items:
-                    item.serialize(packet)
-                # Send file
-                self.client.send(packet)
+            if mouse_button == sf.Mouse.RIGHT:
+                for item in reversed(self.current_farm.land_items):
+                    if contains(item.local_bounds, self.input.window.map_pixel_to_coords(sf.Vector2(x, y), self.view)):
+                        self.current_farm.land_items.remove(item)
+                        break # only delete one tree
+                    
+        if contains(self.load_button.local_bounds, sf.Vector2(x, y)):
+            packet = net.Packet()
+            packet.write(const.packet_request_load_farm)
+            packet.write(self.textbox.text.string) # send the name 
+            self.client.send(packet)
+        if contains(self.save_button.local_bounds, sf.Vector2(x, y)):
+            # Save user information
+            packet = net.Packet()
+            packet.write(const.packet_save_everything)
+            self.user.serialize(packet)
+            # Save farm information
+            packet.write(len(self.current_farm.land_items))
+            for item in self.current_farm.land_items:
+                item.serialize(packet)
+            # Send file
+            self.client.send(packet)
                 
     def on_mouse_moved(self, position, move):
         if not self.mouse_over_window(position.x, position.y):
@@ -81,3 +81,5 @@ class FarmInterface(Interface):
             
         target.view = target.default_view
         super().draw(target)
+        
+        print(self.user.points)

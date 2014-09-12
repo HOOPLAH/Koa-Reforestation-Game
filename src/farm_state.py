@@ -20,8 +20,6 @@ class ClientFarmState(StateClient):
     def handle_packet(self, packet):
         super().handle_packet(packet)
         packet_id = packet.read()
-        if packet_id == const.packet_add_points:
-            self.add_points(packet)
         if packet_id == const.packet_place_item:
             self.place_item(packet, self.land_items)
         elif packet_id == const.packet_load_farm:

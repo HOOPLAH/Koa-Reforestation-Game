@@ -28,12 +28,10 @@ class TeacherControlPanelInterface(Interface):
         self.control_label = Label(sf.Vector2(103.5, 0), "Control", input, sf.Color.WHITE)
         self.points_textbox = Textbox(sf.Vector2(0, 37), 256, "add points", input)
         self.add_button = Button(sf.Vector2(16, 69), "button", input, "add")
-        self.set_button = Button(sf.Vector2(143, 69), "button", input, "set")
         
         self.control_window.add_child(self.control_label)
         self.control_window.add_child(self.points_textbox)
         self.control_window.add_child(self.add_button)
-        self.control_window.add_child(self.set_button)
         
         self.gui_manager.add(self.search_window)
         self.gui_manager.add(self.control_window)

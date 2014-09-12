@@ -18,6 +18,10 @@ for line in file:
         users[values[0]] = Student(None) # empty student, found by first name
         users[values[0]].first_name = values[0]
         users[values[0]].last_name = values[1]
+        data_file = open("content/users/"+values[0]+"_"+values[1]+".txt", 'r')
+        for data_line in data_file:
+            data_values = data_line.split()
+            users[values[0]].points = data_values[0]
     elif values[2] == "Teacher":
         users[values[0]] = Teacher(None, server) # empty teacher
         users[values[0]].first_name = values[0]
@@ -25,7 +29,6 @@ for line in file:
         
 farm = ServerFarmState(server, users)
         
-
 clock = sf.Clock()
 frame_accum = 0
 dt_accum = 0

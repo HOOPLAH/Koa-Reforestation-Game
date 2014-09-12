@@ -25,14 +25,6 @@ class StateClient:
     def draw(self, target):
         self.student.interface.draw(target)
         
-    # Functions to shorten handle_packet()
-    def add_points(self, packet):
-        self.student.points = int(self.student.points)
-        self.student.points += int(packet.read())
-        packet = net.Packet()
-        packet.write(self.student.first_name)
-        self.client.send(packet)
-        
 class StateServer:
     def __init__(self, server, users):
         self.server = server
@@ -53,12 +45,14 @@ class StateServer:
         
     def add_points(self, packet):
         name = packet.read()
-        values = name.split()
         points = packet.read()
-        teacher = Teacher(0, self.server) # make a temporary teacher
-        print("name:", self.users[values[0]].client_id)
-        teacher.add_to_student_points(self.users[values[0]].client_id, points)
-    
+        values = name.split()
+        new_points = int(points)+int(self.users[values[0]].points)
+        self.users[values[0]].points = new_points
+        text = [str(new_points)]
+        file = open("content/users/"+values[0]+"_"+values[1]+".txt", 'w')
+        file.writelines(text)
+        
     # Functions to shorten handle_packet()
     def login(self, packet, client_id):
         # Read incoming packet and save data
@@ -97,7 +91,7 @@ class StateServer:
         # Write data to text file
         filename = "content/users/"+first_name+"_"+l_name+".txt"
         file = open(filename, 'w')
-        text = [f_name, " ", l_name, " ", user_type, " ", str(points)]
+        text = [str(points)]
         file.writelines(text)
         file.close()
                 
@@ -111,7 +105,7 @@ class StateServer:
         # Write data to text file
         filename = "content/users/"+f_name+"_"+l_name+".txt"
         file = open(filename, 'w')
-        text = [f_name, " ", l_name, " ", user_type, " ", str(points)]
+        text = [str(points)]
         file.writelines(text)
         file.close()
         # Get farm data

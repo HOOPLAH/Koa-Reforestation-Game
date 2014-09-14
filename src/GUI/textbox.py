@@ -15,6 +15,7 @@ class Textbox(SpriteElement):
         self.typing = False
         self.overlapping = False # if the text goes out the textbox
         self.default_text = default_text
+        self.last_text = default_text # the last text entered
         self.text = sf.Text(default_text, res.font_farmville, 20)
         self.text.position = self.local_bounds.position
         self.text.color = sf.Color.BLACK
@@ -23,11 +24,13 @@ class Textbox(SpriteElement):
         
     def on_text_entered(self, unicode):
         if unicode != 8 and unicode != 13 and self.typing is True and not self.overlapping: # not backspace, text still inside box
-            self.text.string += chr(unicode);
+            self.text.string += chr(unicode)
+            self.last_text = self.text.string
         elif unicode == 8 and self.typing is True: # You press backspace
             self.text.string = self.text.string[:-1]
             if self.overlapping:
                 self.overlapping = False
+            self.last_text = self.text.string
         
     def on_mouse_button_pressed(self, mouse_button, x, y):
         if contains(self.local_bounds, sf.Vector2(x, y)):

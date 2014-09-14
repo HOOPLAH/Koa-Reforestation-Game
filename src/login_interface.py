@@ -15,8 +15,8 @@ class LoginInterface(Interface):
     def __init__(self, client, input):
         super().__init__(client, None, input)
         
-        self.first_textbox = Textbox(sf.Vector2(0, 16), 256, "joel", input)
-        self.last_textbox = Textbox(sf.Vector2(0, 48), 256, "truesdell", input)
+        self.first_textbox = Textbox(sf.Vector2(0, 16), 256, "lucas", input)
+        self.last_textbox = Textbox(sf.Vector2(0, 48), 256, "derego", input)
         self.login_button = Button(sf.Vector2(124-48, 80), "button", input, "login")
 
         self.window = Window(sf.Vector2(272, 112), 256, 128, sf.Color(50, 50, 120, 255), input)

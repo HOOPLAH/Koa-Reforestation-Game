@@ -78,7 +78,7 @@ class StateServer:
         with open("content/users/"+f_name+"_"+l_name+".txt") as f:
             for line in f:
                 values = line.split()
-                user.points = values[3]
+                user.points = values[0]
                         
         user.serialize(confirm_login_packet)
         self.server.send(client_id, confirm_login_packet)
@@ -116,7 +116,7 @@ class StateServer:
             type = packet.read()
             pos_x = packet.read()
             pos_y = packet.read()
-            line = [str(type), " ", str(pos_x), " ", str(pos_y), "\n"]
+            line = [str(type), " ", str(int(pos_x)), " ", str(int(pos_y)), "\n"]
             file.writelines(line)
         file.close()
         

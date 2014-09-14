@@ -29,12 +29,13 @@ class FarmInterface(Interface):
         self.gui_manager.add(self.window)
         
         self.current_farm = farm # The farm we're currently drawing
-    
+        self.owner_name = student.first_name+student.last_name
+        
     # MOUSE
     def on_mouse_button_released(self, mouse_button, x, y):
         super().on_mouse_button_released(mouse_button, x, y)
         
-        if self.current_farm == self.user.farm:
+        if self.owner_name == self.textbox.last_text:
             if mouse_button == sf.Mouse.LEFT:
                 if not self.mouse_over_window(x, y):
                     packet = net.Packet()
@@ -51,21 +52,22 @@ class FarmInterface(Interface):
                         self.current_farm.land_items.remove(item)
                         break # only delete one tree
                     
+            if contains(self.save_button.local_bounds, sf.Vector2(x, y)):
+                # Save user information
+                packet = net.Packet()
+                packet.write(const.packet_save_everything)
+                self.user.serialize(packet)
+                # Save farm information
+                packet.write(len(self.current_farm.land_items))
+                for item in self.current_farm.land_items:
+                    item.serialize(packet)
+                # Send file
+                self.client.send(packet)
+                    
         if contains(self.load_button.local_bounds, sf.Vector2(x, y)):
             packet = net.Packet()
             packet.write(const.packet_request_load_farm)
             packet.write(self.textbox.text.string) # send the name 
-            self.client.send(packet)
-        if contains(self.save_button.local_bounds, sf.Vector2(x, y)):
-            # Save user information
-            packet = net.Packet()
-            packet.write(const.packet_save_everything)
-            self.user.serialize(packet)
-            # Save farm information
-            packet.write(len(self.current_farm.land_items))
-            for item in self.current_farm.land_items:
-                item.serialize(packet)
-            # Send file
             self.client.send(packet)
                 
     def on_mouse_moved(self, position, move):
@@ -80,6 +82,9 @@ class FarmInterface(Interface):
             item.draw(target)
             
         target.view = target.default_view
-        super().draw(target)
         
-        print(self.user.points)
+        points = sf.Text(str(self.user.points), res.font_8bit, 20)
+        points.position = sf.Vector2(800 - points.local_bounds.width, 0)
+        target.draw(points)
+        
+        super().draw(target)

@@ -19,7 +19,7 @@ class FarmInterface(Interface):
         self.load_button = Button(sf.Vector2(0, 0), "button", input, "load")
         self.save_button = Button(sf.Vector2(0, 32), "button", input, "save")
         
-        self.textbox = Textbox(sf.Vector2(0, 64), 256, "find student", input)
+        self.textbox = Textbox(sf.Vector2(0, 64), 256, student.first_name+" "+student.last_name, input)
         
         self.window = Window(sf.Vector2(0, 0), 256, 128, sf.Color(50, 50, 120, 255), input)
         self.window.add_child(self.load_button)
@@ -29,7 +29,7 @@ class FarmInterface(Interface):
         self.gui_manager.add(self.window)
         
         self.current_farm = farm # The farm we're currently drawing
-        self.owner_name = student.first_name+student.last_name
+        self.owner_name = student.first_name+" "+student.last_name
         
     # MOUSE
     def on_mouse_button_released(self, mouse_button, x, y):

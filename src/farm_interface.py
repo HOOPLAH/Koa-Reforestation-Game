@@ -40,10 +40,10 @@ class FarmInterface(Interface):
                 if not self.mouse_over_window(x, y):
                     packet = net.Packet()
                     packet.write(const.packet_request_place_item)
-                    packet.write("tree")
+                    packet.write("koa")
                     packet.write(self.input.window.map_pixel_to_coords(sf.Vector2(x, y), self.view).x)
                     packet.write(self.input.window.map_pixel_to_coords(sf.Vector2(x, y), self.view).y)
-                    
+        
                     self.client.send(packet)
                 
             if mouse_button == sf.Mouse.RIGHT:

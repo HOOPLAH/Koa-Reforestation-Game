@@ -8,6 +8,7 @@ from src.state import StateServer
 
 from src.users import Student
 from src.farm_item import FarmItem
+from src.farm_item import farm_items
 from src.farm_interface import FarmInterface
 
 # FarmClient is the client's farm, FarmInterface is the farm on the screen
@@ -31,8 +32,10 @@ class ClientFarmState(StateClient):
         item_id = packet.read()
         pos_x = packet.read()
         pos_y = packet.read()
-        item = FarmItem(item_id, sf.Vector2(pos_x, pos_y))
+        item = farm_items[item_id]
+        item = FarmItem(item.type, sf.Vector2(pos_x, pos_y), item.price) # have to actually make a copy of farm_items[]
         land_items.append(item)
+        self.student.points = int(self.student.points)-item.price
         
     def load_farm(self, packet, land_items):
         num_of_trees = packet.read()
@@ -40,7 +43,7 @@ class ClientFarmState(StateClient):
             item_id = packet.read()
             pos_x = int(packet.read())
             pos_y = int(packet.read())
-            item = FarmItem(item_id, sf.Vector2(pos_x, pos_y))
+            item = FarmItem(item_id, sf.Vector2(pos_x, pos_y), 5)
             self.land_items.append(item)
             
 # FarmServer controls all the farms

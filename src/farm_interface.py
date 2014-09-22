@@ -40,7 +40,7 @@ class FarmInterface(Interface):
                 if not self.mouse_over_window(x, y):
                     packet = net.Packet()
                     packet.write(const.packet_request_place_item)
-                    packet.write("koa")
+                    packet.write("pine")
                     packet.write(self.input.window.map_pixel_to_coords(sf.Vector2(x, y), self.view).x)
                     packet.write(self.input.window.map_pixel_to_coords(sf.Vector2(x, y), self.view).y)
         
@@ -74,6 +74,9 @@ class FarmInterface(Interface):
         if not self.mouse_over_window(position.x, position.y):
             if self.mouse_state == 'down': # mouse is down
                 self.view.move(-move.x, -move.y)
+                
+    def on_mouse_wheel_moved(self, delta, position):
+        print(delta)
             
     def draw(self, target):
         target.view = self.view

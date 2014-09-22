@@ -34,6 +34,10 @@ class MouseHandler(metaclass=ABCMeta):
     @abstractmethod
     def on_mouse_moved(self, position, move):
         pass
+        
+    @abstractmethod
+    def on_mouse_wheel_moved(self, delta, position):
+        pass
 
 class InputSystem:
 
@@ -74,6 +78,9 @@ class InputSystem:
                 for handler in self.mouse_handlers:
                     handler.on_mouse_moved(event.position, event.position-self.old_mouse_pos)
                 self.old_mouse_pos = event.position # Update the old mouse position
+            elif type(event) is sf.MouseWheelEvent:
+                for handler in self.mouse_handlers:
+                    handler.on_mouse_wheel_moved(event.delta, event.position)
     
     def add_key_handler(self, handler):
         self.key_handlers.append(handler)

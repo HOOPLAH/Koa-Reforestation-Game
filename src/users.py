@@ -30,7 +30,7 @@ class Student:
     def switch_interface(self, interface):
         for child in self.interface.gui_manager.children:
             self.interface.gui_manager.remove(child)
-            
+        self.interface = None
         self.interface = interface
 
 class Teacher:

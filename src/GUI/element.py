@@ -32,6 +32,9 @@ class Element:
     def on_mouse_moved(self, position, move):
         pass
         
+    def on_mouse_wheel_moved(self, delta, position):
+        pass
+        
     def update(self, dt):
         pass
             

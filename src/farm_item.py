@@ -28,3 +28,4 @@ class FarmItem: # something placeable on the farm (ex. trees)
 # farm land items
 farm_items = {}
 farm_items["koa"] = FarmItem("koa", sf.Vector2(0, 0), 5)
+farm_items["pine"] = FarmItem("pine", sf.Vector2(0, 0), 10)

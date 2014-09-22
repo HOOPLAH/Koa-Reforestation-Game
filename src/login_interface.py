@@ -38,3 +38,6 @@ class LoginInterface(Interface):
                 packet.write(last_name)
                 self.client.send(packet)
                 self.client.update()
+                
+    def on_mouse_wheel_moved(self, delta, position):
+        print(delta)

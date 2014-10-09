@@ -11,7 +11,8 @@ class Student:
         self.state = state # farm, shop, etc.
         self.farm = farm
         self.interface = interface
-        self.inventory = []
+        self.inventory = {}
+        self.inventory_current_item = 0
 
     def serialize(self, packet):
         packet.write("Student")

@@ -25,7 +25,7 @@ class ClientFarmState(StateClient):
             self.place_item(packet, self.land_items)
         elif packet_id == const.packet_load_farm:
             self.land_items[:] = [] # empty land_items[]
-            self.load_farm(packet, self.land_items)
+            self.load_farm(packet)
     
     # Functions to shorten handle_packet()
     def place_item(self, packet, land_items):
@@ -37,7 +37,7 @@ class ClientFarmState(StateClient):
         land_items.append(item)
         self.student.points = int(self.student.points)-item.price
         
-    def load_farm(self, packet, land_items):
+    def load_farm(self, packet):
         num_of_trees = packet.read()
         for tree in range(0, int(num_of_trees)):
             item_id = packet.read()
@@ -87,15 +87,13 @@ class ServerFarmState(StateServer):
         student = self.connected_users[client_id] # student who sent packet
         filename = "content/farms/"+name[0]+"_"+name[1]+".txt"
         with open(filename, 'r') as f:
-            lines = f.readlines()
-            num_of_trees = len([l for l in lines if l.strip(' \n') != ''])
+            num_of_trees = f.readline()
             farm_packet = net.Packet()
             farm_packet.write(const.packet_load_farm)
             farm_packet.write(num_of_trees)
-            with open(filename) as file:
-                for line in file:
-                    values = line.split()
-                    farm_packet.write(values[0])
-                    farm_packet.write(values[1])
-                    farm_packet.write(values[2])
+            for line in f:
+                values = line.split()
+                farm_packet.write(values[0])
+                farm_packet.write(values[1])
+                farm_packet.write(values[2])
             self.server.send(client_id, farm_packet)

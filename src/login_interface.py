@@ -40,4 +40,4 @@ class LoginInterface(Interface):
                 self.client.update()
                 
     def on_mouse_wheel_moved(self, delta, position):
-        print(delta)
+        pass

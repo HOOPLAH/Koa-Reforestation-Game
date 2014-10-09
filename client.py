@@ -48,13 +48,13 @@ while not logged_in and window.is_open:
                 farm = ClientFarmState(client, user, input_sys)
                 user.state = farm
                 user.farm = farm
-                user.interface = FarmInterface(client, user, user.state, input_sys)
                 # request farm for student
                 new_packet = net.Packet()
                 new_packet.write(const.packet_request_load_farm)
                 name = user.first_name+" "+user.last_name
                 new_packet.write(name)
                 client.send(new_packet)
+                user.interface = FarmInterface(client, user, user.state, input_sys)
             elif user_type == "Teacher":
                 user = Teacher(client.client_id, None)
                 user.deserialize(packet)
@@ -63,7 +63,8 @@ while not logged_in and window.is_open:
                 user.farm = farm
                 user.interface = TeacherControlPanelInterface(client, user, input_sys)
             logged_in = True
-            del login_interface
+
+del login_interface
 
 clock = sf.Clock()
 frame_accum = 0

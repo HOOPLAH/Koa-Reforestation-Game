@@ -11,6 +11,8 @@ from src.GUI.gui_manager import GUIManager
 from src.interface import Interface
 from src.rect import contains
 
+from src.farm_item import FarmItem
+
 # FarmInterface draws all the buttons and the farm currently on-screen
 class FarmInterface(Interface):
     def __init__(self, client, student, farm, input):
@@ -40,7 +42,7 @@ class FarmInterface(Interface):
                 if not self.mouse_over_window(x, y):
                     packet = net.Packet()
                     packet.write(const.packet_request_place_item)
-                    packet.write("pine")
+                    packet.write(self.user.inventory[self.user.inventory_current_item].type)
                     packet.write(self.input.window.map_pixel_to_coords(sf.Vector2(x, y), self.view).x)
                     packet.write(self.input.window.map_pixel_to_coords(sf.Vector2(x, y), self.view).y)
         
@@ -76,7 +78,11 @@ class FarmInterface(Interface):
                 self.view.move(-move.x, -move.y)
                 
     def on_mouse_wheel_moved(self, delta, position):
-        print(delta)
+        self.user.inventory_current_item += delta
+        if self.user.inventory_current_item > len(self.user.inventory)-1:
+            self.user.inventory_current_item = 0
+        elif self.user.inventory_current_item < 0:
+            self.user.inventory_current_item = len(self.user.inventory)-1
             
     def draw(self, target):
         target.view = self.view
@@ -89,5 +95,11 @@ class FarmInterface(Interface):
         points = sf.Text(str(self.user.points), res.font_8bit, 20)
         points.position = sf.Vector2(800 - points.local_bounds.width, 0)
         target.draw(points)
+        
+        if len(self.current_farm.land_items) > 0:
+            self.user.inventory = self.current_farm.land_items
+            item = self.user.inventory[0]
+            item = FarmItem(item.type, sf.Vector2(800-40, 600-40), item.price)
+            item.draw(target)
         
         super().draw(target)

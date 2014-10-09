@@ -112,11 +112,16 @@ class StateServer:
         filename = "content/farms/"+f_name+"_"+l_name+".txt"
         file = open(filename, 'w') # rewrite file everytime
         items = packet.read()
+        file.write(str(items), "\n")
         for item in range(0, items):
             type = packet.read()
             pos_x = packet.read()
             pos_y = packet.read()
             line = [str(type), " ", str(int(pos_x)), " ", str(int(pos_y)), "\n"]
             file.writelines(line)
+        # save inventory
+        inv_len = packet.read() # length of inventory
+        for item in range(0, inv_len):
+            
         file.close()
         

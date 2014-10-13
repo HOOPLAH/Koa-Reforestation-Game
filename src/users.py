@@ -12,7 +12,6 @@ class Student:
         self.farm = farm
         self.interface = interface
         self.inventory = {}
-        self.inventory_current_item = 0
 
     def serialize(self, packet):
         packet.write("Student")
@@ -20,13 +19,26 @@ class Student:
         packet.write(self.points)
         packet.write(self.first_name)
         packet.write(self.last_name)
+        
+        # send inventory
+        packet.write(len(self.inventory))
+        for item in self.inventory:
+            packet.write(item)
+            packet.write(self.inventory[item])
 
     def deserialize(self, packet):
-        student = packet.read()
+        student = packet.read() # user type - it's always "student"
         self.client_id = packet.read()
         self.points = packet.read()
         self.first_name = packet.read()
         self.last_name = packet.read()
+        
+        # recieve inventory
+        inv_len = packet.read()
+        for i in range(0, inv_len):
+            type = packet.read()
+            amount = packet.read()
+            self.inventory[type] = amount
         
     def switch_interface(self, interface):
         for child in self.interface.gui_manager.children:

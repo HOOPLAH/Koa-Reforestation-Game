@@ -12,6 +12,7 @@ from src.interface import Interface
 from src.rect import contains
 
 from src.farm_item import FarmItem
+from src.farm_item import farm_items
 
 # FarmInterface draws all the buttons and the farm currently on-screen
 class FarmInterface(Interface):
@@ -33,6 +34,11 @@ class FarmInterface(Interface):
         self.current_farm = farm # The farm we're currently drawing
         self.owner_name = student.first_name+" "+student.last_name
         
+        self.inventory_to_draw = []
+        self.current_inv_item = 0
+        for item in self.user.inventory:
+            self.inventory_to_draw.append(item)
+        
     # MOUSE
     def on_mouse_button_released(self, mouse_button, x, y):
         super().on_mouse_button_released(mouse_button, x, y)
@@ -42,7 +48,7 @@ class FarmInterface(Interface):
                 if not self.mouse_over_window(x, y):
                     packet = net.Packet()
                     packet.write(const.packet_request_place_item)
-                    packet.write(self.user.inventory[self.user.inventory_current_item].type)
+                    packet.write(self.inventory_to_draw[self.current_inv_item])
                     packet.write(self.input.window.map_pixel_to_coords(sf.Vector2(x, y), self.view).x)
                     packet.write(self.input.window.map_pixel_to_coords(sf.Vector2(x, y), self.view).y)
         
@@ -59,6 +65,7 @@ class FarmInterface(Interface):
                 packet = net.Packet()
                 packet.write(const.packet_save_everything)
                 self.user.serialize(packet)
+
                 # Save farm information
                 packet.write(len(self.current_farm.land_items))
                 for item in self.current_farm.land_items:
@@ -78,11 +85,11 @@ class FarmInterface(Interface):
                 self.view.move(-move.x, -move.y)
                 
     def on_mouse_wheel_moved(self, delta, position):
-        self.user.inventory_current_item += delta
-        if self.user.inventory_current_item > len(self.user.inventory)-1:
-            self.user.inventory_current_item = 0
-        elif self.user.inventory_current_item < 0:
-            self.user.inventory_current_item = len(self.user.inventory)-1
+        self.current_inv_item += delta
+        if self.current_inv_item > len(self.inventory_to_draw)-1:
+            self.current_inv_item = 0
+        elif self.current_inv_item < 0:
+            self.current_inv_item = len(self.inventory_to_draw)-1
             
     def draw(self, target):
         target.view = self.view
@@ -96,10 +103,10 @@ class FarmInterface(Interface):
         points.position = sf.Vector2(800 - points.local_bounds.width, 0)
         target.draw(points)
         
-        if len(self.current_farm.land_items) > 0:
-            self.user.inventory = self.current_farm.land_items
-            item = self.user.inventory[0]
-            item = FarmItem(item.type, sf.Vector2(800-40, 600-40), item.price)
+        if len(self.user.inventory) > 0:
+            item = self.inventory_to_draw[self.current_inv_item]
+            item = FarmItem(item, sf.Vector2(0, 0), farm_items[item].price)
+            item.position = sf.Vector2(790-item.width, 0)
             item.draw(target)
         
         super().draw(target)

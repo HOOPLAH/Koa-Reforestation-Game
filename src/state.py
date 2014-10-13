@@ -76,9 +76,14 @@ class StateServer:
                         confirm_login_packet.write("Teacher")
                         
         with open("content/users/"+f_name+"_"+l_name+".txt") as f:
+            user.points = f.readline()
+            # load student inventory
+            inv_len = f.readline()
             for line in f:
                 values = line.split()
-                user.points = values[0]
+                type = values[0]
+                amount = values[1]
+                user.inventory[type] = amount
                         
         user.serialize(confirm_login_packet)
         self.server.send(client_id, confirm_login_packet)
@@ -102,26 +107,28 @@ class StateServer:
         points = packet.read()
         f_name = packet.read()
         l_name = packet.read()
+        inv_len = packet.read() # length of inventory
         # Write data to text file
         filename = "content/users/"+f_name+"_"+l_name+".txt"
         file = open(filename, 'w')
-        text = [str(points)]
+        text = [str(points), str(inv_len), "\n"]
         file.writelines(text)
+        for inv_item in range(0, int(inv_len)):
+            type = packet.read()
+            amount = packet.read()
+            file.writelines([str(type), " ", str(amount), "\n"])
+            print(str(type), str(amount))
         file.close()
         # Get farm data
         filename = "content/farms/"+f_name+"_"+l_name+".txt"
         file = open(filename, 'w') # rewrite file everytime
-        items = packet.read()
-        file.write(str(items), "\n")
-        for item in range(0, items):
+        items = packet.read() # how many items are there 
+        file.write(str(items) + "\n")
+        for item in range(0, int(items)):
             type = packet.read()
             pos_x = packet.read()
             pos_y = packet.read()
             line = [str(type), " ", str(int(pos_x)), " ", str(int(pos_y)), "\n"]
             file.writelines(line)
-        # save inventory
-        inv_len = packet.read() # length of inventory
-        for item in range(0, inv_len):
-            
         file.close()
         

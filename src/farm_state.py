@@ -91,9 +91,10 @@ class ServerFarmState(StateServer):
             farm_packet = net.Packet()
             farm_packet.write(const.packet_load_farm)
             farm_packet.write(num_of_trees)
-            for line in f:
-                values = line.split()
-                farm_packet.write(values[0])
-                farm_packet.write(values[1])
-                farm_packet.write(values[2])
+            if int(num_of_trees) > 0:
+                for line in f:
+                    values = line.split()
+                    farm_packet.write(values[0])
+                    farm_packet.write(values[1])
+                    farm_packet.write(values[2])
             self.server.send(client_id, farm_packet)

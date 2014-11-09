@@ -18,18 +18,26 @@ from src.farm_item import farm_items
 class FarmInterface(Interface):
     def __init__(self, client, student, farm, input):
         super().__init__(client, student, input)
-        
+
+        # CONTROL WINDOW
         self.load_button = Button(sf.Vector2(0, 0), "button", input, "load")
         self.save_button = Button(sf.Vector2(0, 32), "button", input, "save")
+        self.shop_button = Button(sf.Vector2(104, 0), "button", input, "shop")
         
         self.textbox = Textbox(sf.Vector2(0, 64), 256, student.first_name+" "+student.last_name, input)
         
-        self.window = Window(sf.Vector2(0, 0), 256, 128, sf.Color(50, 50, 120, 255), input)
-        self.window.add_child(self.load_button)
-        self.window.add_child(self.save_button)
-        self.window.add_child(self.textbox)
+        self.ctrl_window = Window(sf.Vector2(0, 0), 256, 128, sf.Color(50, 50, 120, 255), input)
+        self.ctrl_window.add_child(self.load_button)
+        self.ctrl_window.add_child(self.save_button)
+        self.ctrl_window.add_child(self.shop_button)
+        self.ctrl_window.add_child(self.textbox)
         
-        self.gui_manager.add(self.window)
+        # SHOP WINDOW
+        self.shop_window = Window(sf.Vector2(168, 50), 512, 384, sf.Color(50, 50, 120, 255), input)
+        self.shop_window.local_bounds.position = sf.Vector2(168, 480-self.shop_window.height/2)
+        self.shop_open = False
+        
+        self.gui_manager.add(self.ctrl_window)
         
         self.current_farm = farm # The farm we're currently drawing
         self.owner_name = student.first_name+" "+student.last_name
@@ -43,16 +51,21 @@ class FarmInterface(Interface):
     def on_mouse_button_released(self, mouse_button, x, y):
         super().on_mouse_button_released(mouse_button, x, y)
         
-        if self.owner_name == self.textbox.last_text:
+        if self.owner_name == self.textbox.last_text: # on own farm
             if mouse_button == sf.Mouse.LEFT:
                 if not self.mouse_over_window(x, y):
-                    packet = net.Packet()
-                    packet.write(const.packet_request_place_item)
-                    packet.write(self.inventory_to_draw[self.current_inv_item])
-                    packet.write(self.input.window.map_pixel_to_coords(sf.Vector2(x, y), self.view).x)
-                    packet.write(self.input.window.map_pixel_to_coords(sf.Vector2(x, y), self.view).y)
+                    if len(self.inventory_to_draw) > 0 and self.shop_open == False:
+                        packet = net.Packet()
+                        packet.write(const.packet_request_place_item)
+                        packet.write(self.inventory_to_draw[self.current_inv_item])
+                        packet.write(self.input.window.map_pixel_to_coords(sf.Vector2(x, y), self.view).x)
+                        packet.write(self.input.window.map_pixel_to_coords(sf.Vector2(x, y), self.view).y)
         
-                    self.client.send(packet)
+                        self.client.send(packet)
+
+                    if self.shop_open:
+                        shop_open = False
+                        self.gui_manager.remove(self.shop_window)
                 
             if mouse_button == sf.Mouse.RIGHT:
                 for item in reversed(self.current_farm.land_items):
@@ -72,6 +85,10 @@ class FarmInterface(Interface):
                     item.serialize(packet)
                 # Send file
                 self.client.send(packet)
+
+            if contains(self.shop_button.local_bounds, sf.Vector2(x, y)):
+                self.shop_open = True
+                self.gui_manager.add(self.shop_window)
                     
         if contains(self.load_button.local_bounds, sf.Vector2(x, y)):
             packet = net.Packet()

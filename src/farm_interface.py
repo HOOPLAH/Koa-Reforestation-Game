@@ -108,5 +108,16 @@ class FarmInterface(Interface):
             item = FarmItem(item, sf.Vector2(0, 0), farm_items[item].price)
             item.position = sf.Vector2(790-item.width, 0)
             item.draw(target)
-        
+
+            amnt = self.user.inventory[self.inventory_to_draw\
+                                       [self.current_inv_item]]
+            amnt = sf.Text(str(amnt), res.font_8bit, 20)
+            amnt.position = sf.Vector2(item.position.x+item.width/2, item.height/2)
+            target.draw(amnt)
+
+            if self.user.inventory[self.inventory_to_draw[self.current_inv_item]] == 0:
+                self.current_inv_item = int(self.current_inv_item)-1
+                del self.user.inventory[self.inventory_to_draw[self.current_inv_item+1]]
+                del self.inventory_to_draw[self.current_inv_item+1]
+                    
         super().draw(target)

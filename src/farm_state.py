@@ -32,11 +32,13 @@ class ClientFarmState(StateClient):
         item_id = packet.read()
         pos_x = packet.read()
         pos_y = packet.read()
-        item = farm_items[item_id]
-        item = FarmItem(item.type, sf.Vector2(pos_x, pos_y), item.price) # have to actually make a copy of farm_items[]
-        land_items.append(item)
-        self.student.points = int(self.student.points)-item.price
-        
+        if int(self.student.inventory[item_id])-1 >= 0:
+            item = farm_items[item_id]
+            item = FarmItem(item.type, sf.Vector2(pos_x, pos_y), item.price) # have to actually make a copy of farm_items[]
+            land_items.append(item)
+            self.student.inventory[item_id] = int(self.student.inventory[item_id])-1
+                
+            
     def load_farm(self, packet):
         num_of_trees = packet.read()
         for tree in range(0, int(num_of_trees)):

@@ -58,14 +58,24 @@ class ServerFarmState(StateServer):
         
         if packet_id == const.packet_login:
             self.login(packet, client_id)
+            
         elif packet_id == const.packet_save_student:
             self.save_student(packet)
+            
         elif packet_id == const.packet_save_everything:
             self.save_everything(packet, client_id)
+
+        elif packet_id == const.packet_request_add_inventory:
+            type = packet.read()
+            self.connected_users[client_id].inventory[type] = int(self.connected_users[client_id].inventory[type])+1
+            print(self.connected_users[client_id].inventory[type])
+            
         elif packet_id == const.packet_request_place_item:
             self.on_request_place_item(packet, client_id)
+            
         elif packet_id == const.packet_request_load_farm:
             self.on_request_load_farm(packet, client_id)
+            
         elif packet_id == const.packet_add_points:
             self.add_points(packet)
     

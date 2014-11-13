@@ -33,8 +33,13 @@ class FarmInterface(Interface):
         self.ctrl_window.add_child(self.textbox)
         
         # SHOP WINDOW
+        self.koa_shop_button = Button(sf.Vector2(0, 0), "button", input, "koa")
+        self.pine_shop_button = Button(sf.Vector2(0, 32), "button", input, "pine")
+        
         self.shop_window = Window(sf.Vector2(168, 50), 512, 384, sf.Color(50, 50, 120, 255), input)
         self.shop_window.local_bounds.position = sf.Vector2(168, 480-self.shop_window.height/2)
+        self.shop_window.add_child(self.koa_shop_button)
+        self.shop_window.add_child(self.pine_shop_button)
         self.shop_open = False
         
         self.gui_manager.add(self.ctrl_window)
@@ -89,6 +94,19 @@ class FarmInterface(Interface):
             if contains(self.shop_button.local_bounds, sf.Vector2(x, y)):
                 self.shop_open = True
                 self.gui_manager.add(self.shop_window)
+
+            if self.shop_open:
+                if contains(self.koa_shop_button.local_bounds, sf.Vector2(x, y)):
+                    packet = net.Packet()
+                    packet.write(const.packet_request_add_inventory)
+                    packet.write("koa")
+                    print(self.user.inventory["koa"])
+                    self.client.send(packet)
+                elif contains(self.pine_shop_button.local_bounds, sf.Vector2(x, y)):
+                    packet = net.Packet()
+                    packet.write(const.packet_request_add_inventory)
+                    packet.write("pine")
+                    self.client.send(packet)
                     
         if contains(self.load_button.local_bounds, sf.Vector2(x, y)):
             packet = net.Packet()

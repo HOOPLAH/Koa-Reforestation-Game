@@ -11,7 +11,13 @@ class GUIManager():
         
     def remove(self, element):
         self.children.remove(element)
-        del element
+        
+    def exists(self, element): 
+        for child in self.children:
+            if child == element:
+                return True
+                
+        return False
     
     def update(self, dt):
         for child in self.children:

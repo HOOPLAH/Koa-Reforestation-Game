@@ -68,10 +68,10 @@ class FarmInterface(Interface):
         
                         self.client.send(packet)
 
-                    if self.shop_open:
-                        shop_open = False
+                    if self.shop_open == True:
                         self.gui_manager.remove(self.shop_window)
-                
+                        self.shop_open = False
+                        
             if mouse_button == sf.Mouse.RIGHT:
                 for item in reversed(self.current_farm.land_items):
                     if contains(item.local_bounds, self.input.window.map_pixel_to_coords(sf.Vector2(x, y), self.view)):
@@ -100,7 +100,6 @@ class FarmInterface(Interface):
                     packet = net.Packet()
                     packet.write(const.packet_request_add_inventory)
                     packet.write("koa")
-                    print(self.user.inventory["koa"])
                     self.client.send(packet)
                 elif contains(self.pine_shop_button.local_bounds, sf.Vector2(x, y)):
                     packet = net.Packet()

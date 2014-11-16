@@ -23,6 +23,9 @@ class ClientFarmState(StateClient):
         packet_id = packet.read()
         if packet_id == const.packet_place_item:
             self.place_item(packet, self.land_items)
+        elif packet_id == const.packet_add_to_inventory:
+            type = packet.read()
+            self.student.inventory[type] = int(self.student.inventory[type])+1
         elif packet_id == const.packet_load_farm:
             self.land_items[:] = [] # empty land_items[]
             self.load_farm(packet)
@@ -38,7 +41,6 @@ class ClientFarmState(StateClient):
             land_items.append(item)
             self.student.inventory[item_id] = int(self.student.inventory[item_id])-1
                 
-            
     def load_farm(self, packet):
         num_of_trees = packet.read()
         for tree in range(0, int(num_of_trees)):
@@ -67,8 +69,10 @@ class ServerFarmState(StateServer):
 
         elif packet_id == const.packet_request_add_inventory:
             type = packet.read()
-            self.connected_users[client_id].inventory[type] = int(self.connected_users[client_id].inventory[type])+1
-            print(self.connected_users[client_id].inventory[type])
+            packet = net.Packet()
+            packet.write(const.packet_add_to_inventory)
+            packet.write(type)
+            self.server.send(client_id, packet)
             
         elif packet_id == const.packet_request_place_item:
             self.on_request_place_item(packet, client_id)

@@ -77,6 +77,8 @@ class StateServer:
                         
         with open("content/users/"+f_name+"_"+l_name+".txt") as f:
             user.points = f.readline()
+            
+        with open("content/inventories/"+f_name+"_"+l_name+".txt") as f:
             # load student inventory
             inv_len = f.readline()
             for line in f:
@@ -108,17 +110,25 @@ class StateServer:
         f_name = packet.read()
         l_name = packet.read()
         inv_len = packet.read() # length of inventory
+        
         # Write data to text file
         filename = "content/users/"+f_name+"_"+l_name+".txt"
         file = open(filename, 'w')
-        text = [str(points), str(inv_len), "\n"]
+        text = [str(points), "\n"]
         file.writelines(text)
+        file.close()
+        
+        # write inventory
+        filename = "content/inventories/"+f_name+"_"+l_name+".txt"
+        file = open(filename, 'w')
+        file.write(str(inv_len) + "\n")
         for inv_item in range(0, int(inv_len)):
             type = packet.read()
             amount = packet.read()
             file.writelines([str(type), " ", str(amount), "\n"])
             print(str(type), str(amount))
         file.close()
+        
         # Get farm data
         filename = "content/farms/"+f_name+"_"+l_name+".txt"
         file = open(filename, 'w') # rewrite file everytime

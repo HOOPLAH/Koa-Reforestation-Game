@@ -63,8 +63,10 @@ class FarmInterface(Interface):
                         packet = net.Packet()
                         packet.write(const.packet_request_place_item)
                         packet.write(self.inventory_to_draw[self.current_inv_item])
-                        packet.write(self.input.window.map_pixel_to_coords(sf.Vector2(x, y), self.view).x)
-                        packet.write(self.input.window.map_pixel_to_coords(sf.Vector2(x, y), self.view).y)
+                        packet.write(self.input.window.map_pixel_to_coords\
+                            (sf.Vector2(x, y), self.view).x)
+                        packet.write(self.input.window.map_pixel_to_coords\
+                            (sf.Vector2(x, y), self.view).y)
         
                         self.client.send(packet)
 
@@ -74,7 +76,8 @@ class FarmInterface(Interface):
                         
             if mouse_button == sf.Mouse.RIGHT:
                 for item in reversed(self.current_farm.land_items):
-                    if contains(item.local_bounds, self.input.window.map_pixel_to_coords(sf.Vector2(x, y), self.view)):
+                    if contains(item.local_bounds,\
+                            self.input.window.map_pixel_to_coords(sf.Vector2(x, y), self.view)):
                         self.current_farm.land_items.remove(item)
                         break # only delete one tree
                     
@@ -137,21 +140,24 @@ class FarmInterface(Interface):
         points.position = sf.Vector2(800 - points.local_bounds.width, 0)
         target.draw(points)
         
-        if len(self.user.inventory) > 0:
+        for item in self.user.inventory: #item = koa, pine
+            if int(self.user.inventory[item]) > 0:
+                self.inventory_to_draw.append(item)
+        
+        if len(self.user.inventory) > 0 and len(self.inventory_to_draw) > 0:
             item = self.inventory_to_draw[self.current_inv_item]
             item = FarmItem(item, sf.Vector2(0, 0), farm_items[item].price)
             item.position = sf.Vector2(790-item.width, 0)
             item.draw(target)
 
-            amnt = self.user.inventory[self.inventory_to_draw\
-                                       [self.current_inv_item]]
+            amnt = self.user.inventory[self.inventory_to_draw[self.current_inv_item]]
             amnt = sf.Text(str(amnt), res.font_8bit, 20)
             amnt.position = sf.Vector2(item.position.x+item.width/2, item.height/2)
             target.draw(amnt)
 
             if self.user.inventory[self.inventory_to_draw[self.current_inv_item]] == 0:
                 self.current_inv_item = int(self.current_inv_item)-1
-                del self.user.inventory[self.inventory_to_draw[self.current_inv_item+1]]
+                #del self.user.inventory[self.inventory_to_draw[self.current_inv_item+1]]
                 del self.inventory_to_draw[self.current_inv_item+1]
                     
         super().draw(target)

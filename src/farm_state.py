@@ -21,11 +21,14 @@ class ClientFarmState(StateClient):
     def handle_packet(self, packet):
         super().handle_packet(packet)
         packet_id = packet.read()
+        
         if packet_id == const.packet_place_item:
             self.place_item(packet, self.land_items)
+            
         elif packet_id == const.packet_add_to_inventory:
             type = packet.read()
             self.student.inventory[type] = int(self.student.inventory[type])+1
+            
         elif packet_id == const.packet_load_farm:
             self.land_items[:] = [] # empty land_items[]
             self.load_farm(packet)

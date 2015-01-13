@@ -23,8 +23,8 @@ class Student:
         # send inventory
         packet.write(len(self.inventory))
         for item in self.inventory:
-            packet.write(item)
-            packet.write(self.inventory[item])
+            packet.write(item) # type
+            packet.write(self.inventory[item]) # amount
 
     def deserialize(self, packet):
         student = packet.read() # user type - it's always "student"

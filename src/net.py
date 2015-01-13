@@ -102,6 +102,9 @@ class Server:
 
     def add_handler(self, handler):
         self.handlers.append(handler)
+        
+    def remove_handler(self, handler):
+        self.handlers.remove(handler)
     
     def update(self):
         packets = {} # Maps client_id sender to packet

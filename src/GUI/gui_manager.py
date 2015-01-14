@@ -12,6 +12,9 @@ class GUIManager():
     def remove(self, element):
         self.children.remove(element)
         
+    def remove_all(self):
+        self.children = []
+        
     def exists(self, element): 
         for child in self.children:
             if child == element:

@@ -1,4 +1,11 @@
-from src.states.state import GameStates
+from enum import IntEnum
+
+class GameStates(IntEnum):
+	LOGIN = 0
+	HOME_FARM = 1
+	GUEST_FARM = 2
+	SHOP = 3
+	STATISTICS = 4
 
 class User:
     def __init__(self, client, user_type):
@@ -44,11 +51,21 @@ class User:
             type = packet.read()
             amount = packet.read()
             self.inventory[type] = amount
-            
-        print(self.inventory["koa"])
 		
     def render(self, target):
         self.states[self.state].render(target)
 		
     def update(self, dt):
         self.states[self.state].update(dt)
+        
+    def switch_state(self, state):
+        # stop gui, updating, taking events, etc.
+        self.states[self.state].gui_manager.remove_all()
+        self.states[self.state].input.remove_key_handler(self.states[self.state])
+        self.states[self.state].input.remove_text_handler(self.states[self.state])
+        self.states[self.state].input.remove_mouse_handler(self.states[self.state])
+        
+        # set new state
+        self.state = state
+        
+        print(self.state)

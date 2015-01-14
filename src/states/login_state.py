@@ -3,6 +3,7 @@ import src.net as net
 import src.const as const
 
 from src.states.state import ClientState
+from src.user import GameStates
 
 from src.GUI.button import Button
 from src.GUI.textbox import Textbox
@@ -29,17 +30,15 @@ class LoginState(ClientState):
     def handle_packet(self, packet):
         packet_id = packet.read()
             
-            if packet_id == const.PacketTypes.LOGIN:
-                self.user.deserialize(packet)
-
-    def render(self, target):
-        super().render(target)
-
-    def update(self, dt):
-        super().update(dt)
+        if packet_id == const.PacketTypes.LOGIN:
+            self.user.deserialize(packet)
+            self.gui_manager.remove_all()
+            self.user.switch_state(GameStates.HOME_FARM)
 
     def on_mouse_button_pressed(self, mouse_button, x, y):
         super().on_mouse_button_pressed(mouse_button, x , y)
+        
+        print("yee")
         
         if mouse_button == sf.Mouse.LEFT: # login button pressed
             if contains(self.login_button.local_bounds, sf.Vector2(x, y)):
@@ -47,5 +46,5 @@ class LoginState(ClientState):
                 login_packet.write(const.PacketTypes.LOGIN)
                 login_packet.write(self.first_textbox.last_text)
                 login_packet.write(self.last_textbox.last_text)
-                self.packet_manager.send(login_packet)
+                self.client.send(login_packet)
             

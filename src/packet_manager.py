@@ -1,21 +1,8 @@
+import re
 import src.net as net
 import src.const as const
 
 from src.user import User
-
-class ClientPacketManager:
-    def __init__(self, user):
-        self.user = user
-        self.client = user.client
-        
-    def handle_packet(self, packet):
-        packet_id = packet.read()
-        
-        if packet_id == const.PacketTypes.LOGIN:
-            self.user.deserialize(packet)
-            
-    def send(self, packet):
-        self.client.send(packet)
         
 class ServerPacketManager:
     def __init__(self, server):
@@ -60,26 +47,14 @@ class ServerPacketManager:
         file = open(filename, 'r')
         for line in file:
             values = line.split() # each word(value) in txt file
-            if values[0] == "Student":
-                # create new student, add him to users list
-                # client, server, states, user_type
-                self.users[values[2]] = User(None, None, "Student") # empty student, found by username
-                self.users[values[2]].first_name = values[0] # values[2] is username
-                self.users[values[2]].last_name = values[1]
-                
-                # get points from different file
-                self.data_file = open("content/users/"+values[0]+"_"+values[1]+".txt", 'r')
-                for data_line in data_file:
-                    data_values = data_line.split()
-                    self.users[values[0]].points = data_values[0]
-                    
-            elif values[0] == "Teacher":
-                # create new teacher, add him to users list
-                # client, server, states, user_type
-                self.users[values[0]] = User(None, self.server, "Teacher") # empty teacher
-                self.users[values[0]].first_name = values[0] # values[0] is first name
-                self.users[values[0]].last_name = values[1]
-                
+            # create new student, add him to users list
+            # client, server, states, user_type
+            self.users[values[3]] = User(None, values[0]) # empty student, found by username
+            self.users[values[3]].first_name = values[1]
+            self.users[values[3]].last_name = values[2]
+            self.users[values[3]].username = values[3]
+            self.users[values[3]].password = values[4]
+
     # --
     # LOGIN
     # --
@@ -98,16 +73,13 @@ class ServerPacketManager:
         with open("content/users/all_registered_users.txt") as file:
             for line in file:
                 if re.match(username, line):
-                    values = line.split()
-                    user.user_type = values[0] # student or teacher
+                    pass # don't need it right now
                         
-        # get user info - continued                
+        # get user data (points, inventory)              
         with open("content/users/"+user.first_name+"_"+user.last_name+".txt") as file:
             user.points = file.readline()
             
-        # load student inventory  
-        with open("content/inventories/"+user.first_name+"_"+user.last_name+".txt") as file:
-            inventory_size = file.readline()
+            inventory_size = file.readline() # make sure this is the last bit of data in file
             for line in file:
                 values = line.split()
                 type = values[0]

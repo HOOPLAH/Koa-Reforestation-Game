@@ -4,10 +4,12 @@ import src.net as net
 from src.input_system import InputSystem
 from src.GUI.gui_manager import GUIManager
 
-from src.states.state import GameStates
 from src.states.login_state import LoginState
+from src.states.farm_state import HomeFarmState
+from src.states.farm_state import GuestFarmState
 
 from src.user import User
+from src.user import GameStates
 
 # create the main window
 window = sf.RenderWindow(sf.VideoMode(800, 480), "Koa Reforestation Client")
@@ -21,8 +23,10 @@ user = User(client, "")
 
 # make all the states
 login_state = LoginState(client, input_sys, gui, user)
+home = HomeFarmState(client, input_sys, gui, user)
+guest = GuestFarmState(client, input_sys, gui, user)
 
-user.states = [login_state]
+user.states = [login_state, home, guest]
 user.state = GameStates.LOGIN
 
 clock = sf.Clock()

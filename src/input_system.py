@@ -85,9 +85,18 @@ class InputSystem:
     def add_key_handler(self, handler):
         self.key_handlers.append(handler)
         
+    def remove_key_handler(self, handler):
+        self.key_handlers.remove(handler)
+        
     def add_text_handler(self, handler):
         self.text_handlers.append(handler)
+        
+    def remove_text_handler(self, handler):
+        self.text_handlers.remove(handler)
     
     def add_mouse_handler(self, handler):
-        self.mouse_handlers.append(handler) 
+        self.mouse_handlers.append(handler)
+        
+    def remove_mouse_handler(self, handler):
+        self.mouse_handlers.remove(handler) 
     

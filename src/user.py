@@ -67,5 +67,6 @@ class User:
         
         # set new state
         self.state = state
+        self.state.init()
         
         print(self.state)

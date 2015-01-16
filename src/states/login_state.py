@@ -14,6 +14,12 @@ from src.rect import contains
 
 class LoginState(ClientState):
     def __init__(self, client, input, gui, user):
+        self.client = client
+        self.input = input
+        self.gui_manager = gui_manager
+        self.user = user
+        
+    def init(self, client, input, gui, user):
         super().__init__(client, input, gui, user)
 
         self.first_textbox = Textbox(sf.Vector2(0, 16), 256, "lucas", input)

@@ -14,19 +14,16 @@ from src.rect import contains
 
 class LoginState(ClientState):
     def __init__(self, client, input, gui, user):
-        self.client = client
-        self.input = input
-        self.gui_manager = gui_manager
-        self.user = user
-        
-    def init(self, client, input, gui, user):
         super().__init__(client, input, gui, user)
+        
+    def init(self):
+        super().init()
 
-        self.first_textbox = Textbox(sf.Vector2(0, 16), 256, "lucas", input)
-        self.last_textbox = Textbox(sf.Vector2(0, 48), 256, "derego1", input)
-        self.login_button = Button(sf.Vector2(124-48, 80), "button", input, "login")
+        self.first_textbox = Textbox(sf.Vector2(0, 16), 256, "lucas", self.input)
+        self.last_textbox = Textbox(sf.Vector2(0, 48), 256, "derego1", self.input)
+        self.login_button = Button(sf.Vector2(124-48, 80), "button", self.input, "login")
 
-        self.window = Window(sf.Vector2(272, 112), 256, 128, sf.Color(50, 50, 120, 255), input)
+        self.window = Window(sf.Vector2(272, 112), 256, 128, sf.Color(50, 50, 120, 255), self.input)
         self.window.add_child(self.login_button)
         self.window.add_child(self.first_textbox)
         self.window.add_child(self.last_textbox)
@@ -43,8 +40,6 @@ class LoginState(ClientState):
 
     def on_mouse_button_pressed(self, mouse_button, x, y):
         super().on_mouse_button_pressed(mouse_button, x , y)
-        
-        print("yee")
         
         if mouse_button == sf.Mouse.LEFT: # login button pressed
             if contains(self.login_button.local_bounds, sf.Vector2(x, y)):

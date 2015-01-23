@@ -26,21 +26,31 @@ class Textbox(SpriteElement):
         if unicode != 8 and unicode != 13 and self.typing is True and not self.overlapping: # not backspace, text still inside box
             self.text.string += chr(unicode)
             self.last_text = self.text.string
+            if self.text.string[0][0] == " " and len(self.text.string) != 1: # first letter is a space - nothing
+                self.text.string = self.text.string[-1:]
+                print("yolo")
         elif unicode == 8 and self.typing is True: # You press backspace
-            self.text.string = self.text.string[:-1]
-            if self.overlapping:
-                self.overlapping = False
-            self.last_text = self.text.string
+            if len(self.text.string) > 1:
+                self.text.string = self.text.string[:-1] # delete last letter of string
+                if self.overlapping:
+                    self.overlapping = False
+                self.last_text = self.text.string
+            elif len(self.text.string) <= 1:
+                self.text.string = " "
         
     def on_mouse_button_pressed(self, mouse_button, x, y):
         if contains(self.local_bounds, sf.Vector2(x, y)):
             self.typing = True
             if self.text.string == self.default_text: # if it's the default text, get rid of it
-                self.text.string = ""
+                self.text.string = " "
         elif not contains(self.local_bounds, sf.Vector2(x, y)):
             self.typing = False
-            if self.text.string == "": # if you unclick it and there's nothing there, make it the default text
+            if self.text.string == " ": # if you unclick it and there's nothing there, make it the default text
                 self.text.string = self.default_text
+
+    #
+    #
+    # TEXTBOX CANNOT CONTAIN NO STRING
         
     def draw(self, target):
         super().draw(target)

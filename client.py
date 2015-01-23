@@ -28,6 +28,7 @@ guest = GuestFarmState(client, input_sys, gui, user)
 
 user.states = [login_state, home, guest]
 user.state = GameStates.LOGIN
+user.states[user.state].init()
 
 clock = sf.Clock()
 

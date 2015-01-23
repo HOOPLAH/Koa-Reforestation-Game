@@ -9,8 +9,7 @@ class GameStates(IntEnum):
 
 class User:
     def __init__(self, client, user_type):
-        if client is not None:
-            self.client = client
+        self.client = client
         self.user_type = user_type
 	        
         self.first_name = ""
@@ -19,7 +18,6 @@ class User:
         self.password = ""
 		
         self.points = 0
-        self.farm = None
         self.inventory = {}
 		
         self.states = []
@@ -59,7 +57,7 @@ class User:
         self.states[self.state].update(dt)
         
     def switch_state(self, state):
-        # stop gui, updating, taking events, etc.
+        # stop gui, updating, taking input, etc.
         self.states[self.state].gui_manager.remove_all()
         self.states[self.state].input.remove_key_handler(self.states[self.state])
         self.states[self.state].input.remove_text_handler(self.states[self.state])
@@ -67,6 +65,4 @@ class User:
         
         # set new state
         self.state = state
-        self.state.init()
-        
-        print(self.state)
+        self.states[self.state].init()

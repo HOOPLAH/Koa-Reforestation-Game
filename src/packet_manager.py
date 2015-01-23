@@ -25,13 +25,23 @@ class ServerPacketManager:
     
         if packet_id == const.PacketTypes.LOGIN:
             self.on_login(packet, client_id)
+            
+        elif packet_id == const.PacketTypes.ADD_FARM_ITEM:
+            type = packet.read() # type of tree
+            x = packet.read()
+            y = packet.read()
+            
+            packet.write(packet_id)
+            packet.write(type)
+            packet.write(x)
+            packet.write(y)
+            self.send(client_id, packet)
         
     def send(self, client_id, packet):
         self.server.send(client_id, packet)
         
     def broadcast(self, packet):
         self.server.broadcast(packet)
-        
         
     # FN TO SHORTEN CODE ABOVE -- WARNING: MESSY #
     #                                            #
@@ -52,7 +62,7 @@ class ServerPacketManager:
             self.users[values[3]] = User(None, values[0]) # empty student, found by username
             self.users[values[3]].first_name = values[1]
             self.users[values[3]].last_name = values[2]
-            self.users[values[3]].username = values[3]
+            self.users[values[3]].user_name = values[3]
             self.users[values[3]].password = values[4]
 
     # --
@@ -65,29 +75,30 @@ class ServerPacketManager:
         pw = packet.read()
         
         # get user from registered users
-        user = self.users[username]
-        user.client_id = client_id
-        self.connected_users[client_id] = user
-        
-        # get user info
-        with open("content/users/all_registered_users.txt") as file:
-            for line in file:
-                if re.match(username, line):
-                    pass # don't need it right now
-                        
-        # get user data (points, inventory)              
-        with open("content/users/"+user.first_name+"_"+user.last_name+".txt") as file:
-            user.points = file.readline()
+        if self.users[username].password == pw:
+            user = self.users[username]
+            user.client_id = client_id
+            self.connected_users[client_id] = user
             
-            inventory_size = file.readline() # make sure this is the last bit of data in file
-            for line in file:
-                values = line.split()
-                type = values[0]
-                amount = values[1]
-                user.inventory[type] = amount
-        
-        # Send new packet
-        new_packet = net.Packet()
-        new_packet.write(const.PacketTypes.LOGIN)                
-        user.serialize(new_packet)
-        self.send(client_id, new_packet)
+            # get user info
+            with open("content/users/all_registered_users.txt") as file:
+                for line in file:
+                    if re.match(username, line):
+                        pass # don't need it right now
+                            
+            # get user data (points, inventory)              
+            with open("content/users/"+user.first_name+"_"+user.last_name+".txt") as file:
+                user.points = file.readline()
+                
+                inventory_size = file.readline() # make sure this is the last bit of data in file
+                for line in file:
+                    values = line.split()
+                    type = values[0]
+                    amount = values[1]
+                    user.inventory[type] = amount
+            
+            # Send new packet
+            new_packet = net.Packet()
+            new_packet.write(const.PacketTypes.LOGIN)                
+            user.serialize(new_packet)
+            self.send(client_id, new_packet)

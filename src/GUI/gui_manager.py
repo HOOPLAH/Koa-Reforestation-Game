@@ -22,8 +22,8 @@ class GUIManager():
         return False
         
     def point_over_any_element(self, x, y):
-        for i in range(0, len(children)):
-            if contains(children[i].local_bounds, sf.Vector2(x, y)):
+        for i in range(0, len(self.children)):
+            if contains(self.children[i].local_bounds, sf.Vector2(x, y)):
                 return True
             
         return False

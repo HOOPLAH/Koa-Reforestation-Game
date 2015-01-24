@@ -1,11 +1,6 @@
 from enum import IntEnum
 
-class GameStates(IntEnum):
-	LOGIN = 0
-	HOME_FARM = 1
-	GUEST_FARM = 2
-	SHOP = 3
-	STATISTICS = 4
+from src.farm import Farm
 
 class User:
     def __init__(self, client, user_type):
@@ -19,6 +14,7 @@ class User:
 		
         self.points = 0
         self.inventory = {}
+        self.farm = Farm()
 		
         self.states = []
         self.state = None
@@ -30,6 +26,8 @@ class User:
         packet.write(self.user_name)
         packet.write(self.password)
         packet.write(self.points)
+
+        self.farm.serialize(packet)
         
         packet.write(len(self.inventory))
         for item in self.inventory:
@@ -43,6 +41,8 @@ class User:
         self.user_name = packet.read()
         self.password = packet.read()
         self.points = packet.read()
+
+        self.farm.deserialize(packet)
         
         inventory_size = packet.read()
         for item in range(0, inventory_size):

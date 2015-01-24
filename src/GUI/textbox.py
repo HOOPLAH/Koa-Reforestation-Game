@@ -28,7 +28,6 @@ class Textbox(SpriteElement):
             self.last_text = self.text.string
             if self.text.string[0][0] == " " and len(self.text.string) != 1: # first letter is a space - nothing
                 self.text.string = self.text.string[-1:]
-                print("yolo")
         elif unicode == 8 and self.typing is True: # You press backspace
             if len(self.text.string) > 1:
                 self.text.string = self.text.string[:-1] # delete last letter of string

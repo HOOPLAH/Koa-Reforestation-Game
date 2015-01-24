@@ -3,7 +3,6 @@ import src.net as net
 import src.const as const
 
 from src.states.state import ClientState
-from src.user import GameStates
 
 from src.GUI.button import Button
 from src.GUI.textbox import Textbox
@@ -36,7 +35,7 @@ class LoginState(ClientState):
         if packet_id == const.PacketTypes.LOGIN:
             self.user.deserialize(packet)
             self.gui_manager.remove_all()
-            self.user.switch_state(GameStates.HOME_FARM)
+            self.user.switch_state(const.GameStates.HOME_FARM)
 
     def on_mouse_button_pressed(self, mouse_button, x, y):
         super().on_mouse_button_pressed(mouse_button, x , y)

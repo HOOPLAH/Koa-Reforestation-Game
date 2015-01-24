@@ -1,8 +1,13 @@
+import sfml as sf
 import re
 import src.net as net
 import src.const as const
 
 from src.user import User
+
+from src.farm_item import farm_items
+from src.farm_item import FarmItem
+from src.farm import Farm
         
 class ServerPacketManager:
     def __init__(self, server):
@@ -18,7 +23,7 @@ class ServerPacketManager:
         pass
         
     def on_disconnect(self, client_id):
-        pass
+        del self.connected_users[client_id] # delete that one user from the list
         
     def handle_packet(self, packet, client_id):
         packet_id = packet.read()
@@ -31,10 +36,28 @@ class ServerPacketManager:
             x = packet.read()
             y = packet.read()
             
+            # got all data from packet, send it back with new data
             packet.write(packet_id)
             packet.write(type)
             packet.write(x)
             packet.write(y)
+            self.send(client_id, packet)
+
+        elif packet_id == const.PacketTypes.SWITCH_FARM:
+            name = packet.read()
+
+            # got all data from packet, send it back with new data
+            new_packet = net.Packet()
+            new_packet.write(packet_id)
+            new_packet.write(name)
+            self.send(client_id, new_packet)
+
+        elif packet_id == const.PacketTypes.LOAD_FARM:
+            name = packet.read()
+
+            # got all data from packet, send it back with new data
+            packet.write(packet_id)
+            self.users[name].serialize(packet)
             self.send(client_id, packet)
         
     def send(self, client_id, packet):
@@ -96,6 +119,11 @@ class ServerPacketManager:
                     type = values[0]
                     amount = values[1]
                     user.inventory[type] = amount
+
+            with open("content/farms/"+user.first_name+"_"+user.last_name+".txt") as file:
+                for line in file:
+                    values = line.split()
+                    user.farm.add_farm_item(values[0], values[1], values[2])
             
             # Send new packet
             new_packet = net.Packet()

@@ -14,13 +14,6 @@ class GUIManager():
     def remove_all(self):
         self.children = []
         
-    def exists(self, element): 
-        for child in self.children:
-            if child == element:
-                return True
-                
-        return False
-        
     def point_over_any_element(self, x, y):
         for i in range(0, len(self.children)):
             if contains(self.children[i].local_bounds, sf.Vector2(x, y)):
@@ -29,11 +22,8 @@ class GUIManager():
         return False
         
     def point_over_element(self, element, x, y):
-        if self.exists(element):
-            for child in self.children:
-                if child == element:
-                    if contains(child.local_bounds, sf.Vector2(x, y)):
-                        return True
+        if contains(element.local_bounds, sf.Vector2(x, y)):
+            return True
         
         return False
     

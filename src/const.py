@@ -14,5 +14,6 @@ class PacketTypes(IntEnum):
     ADD_INVENTORY_ITEM = 2
     SWITCH_FARM = 3
     LOAD_FARM = 4
+    SAVE_FARM = 5
 
 PORT = 50002

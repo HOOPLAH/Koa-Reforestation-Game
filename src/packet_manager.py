@@ -47,18 +47,31 @@ class ServerPacketManager:
             name = packet.read()
 
             # got all data from packet, send it back with new data
-            new_packet = net.Packet()
-            new_packet.write(packet_id)
-            new_packet.write(name)
-            self.send(client_id, new_packet)
+            if name in self.users:
+                packet = net.Packet()
+                packet.write(packet_id)
+                packet.write(name)
+                self.send(client_id, packet)
 
         elif packet_id == const.PacketTypes.LOAD_FARM:
             name = packet.read()
 
             # got all data from packet, send it back with new data
             packet.write(packet_id)
-            self.users[name].serialize(packet)
+            self.load_farm(self.users[name])
+            self.users[name].farm.serialize(packet)
             self.send(client_id, packet)
+            
+        elif packet_id == const.PacketTypes.SAVE_FARM:
+            farm = Farm()
+            farm.deserialize(packet)
+            user = self.connected_users[client_id]
+            file = open("content/farms/"+user.first_name+"_"+user.last_name+".txt", "w+")
+            for item in farm.farm_items:
+                line = [str(item.type), " ", str(int(item.position.x)), " ", str(int(item.position.y)), "\n"]
+                file.writelines(line)
+                
+            file.close()
         
     def send(self, client_id, packet):
         self.server.send(client_id, packet)
@@ -79,14 +92,20 @@ class ServerPacketManager:
         filename = "content/users/all_registered_users.txt"
         file = open(filename, 'r')
         for line in file:
+            user = User(None, "")
             values = line.split() # each word(value) in txt file
             # create new student, add him to users list
-            # client, server, states, user_type
-            self.users[values[3]] = User(None, values[0]) # empty student, found by username
-            self.users[values[3]].first_name = values[1]
-            self.users[values[3]].last_name = values[2]
-            self.users[values[3]].user_name = values[3]
-            self.users[values[3]].password = values[4]
+            user.user_type = values[0]
+            user.first_name = values[1]
+            user.last_name = values[2]
+            user.user_name = values[3]
+            user.password = values[4]
+            
+            # get user data (points, inventory, farm)
+            self.load_user_data(user)
+            self.load_farm(user)
+            
+            self.users[user.user_name] = user
 
     # --
     # LOGIN
@@ -95,10 +114,10 @@ class ServerPacketManager:
     def on_login(self, packet, client_id):
         # read incoming packet and save data
         username = packet.read()
-        pw = packet.read()
+        password = packet.read()
         
         # get user from registered users
-        if self.users[username].password == pw:
+        if self.users[username].password:
             user = self.users[username]
             user.client_id = client_id
             self.connected_users[client_id] = user
@@ -108,25 +127,27 @@ class ServerPacketManager:
                 for line in file:
                     if re.match(username, line):
                         pass # don't need it right now
-                            
-            # get user data (points, inventory)              
-            with open("content/users/"+user.first_name+"_"+user.last_name+".txt") as file:
-                user.points = file.readline()
-                
-                inventory_size = file.readline() # make sure this is the last bit of data in file
-                for line in file:
-                    values = line.split()
-                    type = values[0]
-                    amount = values[1]
-                    user.inventory[type] = amount
-
-            with open("content/farms/"+user.first_name+"_"+user.last_name+".txt") as file:
-                for line in file:
-                    values = line.split()
-                    user.farm.add_farm_item(values[0], values[1], values[2])
             
             # Send new packet
             new_packet = net.Packet()
             new_packet.write(const.PacketTypes.LOGIN)                
             user.serialize(new_packet)
             self.send(client_id, new_packet)
+            
+    def load_user_data(self, user):
+        with open("content/users/"+user.first_name+"_"+user.last_name+".txt") as file:
+            user.points = file.readline()
+            
+            inventory_size = file.readline() # make sure this is the last bit of data in file
+            for line in file:
+                values = line.split()
+                type = values[0]
+                amount = values[1]
+                user.inventory[type] = amount
+            
+    def load_farm(self, user):
+        user.farm.remove_all()
+        with open("content/farms/"+user.first_name+"_"+user.last_name+".txt") as file:
+            for line in file:
+                values = line.split()
+                user.farm.add_farm_item(values[0], float(values[1]), float(values[2]))

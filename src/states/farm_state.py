@@ -12,6 +12,7 @@ from src.GUI.gui_manager import GUIManager
 
 from src.user import User
 
+from src.farm import Farm
 from src.farm_item import FarmItem
 from src.farm_item import farm_items
 
@@ -44,23 +45,17 @@ class HomeFarmState(ClientState):
             type = packet.read() # type of tree
             x = packet.read()
             y = packet.read()
-            
             self.user.farm.add_farm_item(type, x, y)
 
         elif packet_id == const.PacketTypes.SWITCH_FARM:
             name = packet.read()
-
-            self.gui_manager.remove_all()
-            packet = net.Packet()
             packet.write(const.PacketTypes.LOAD_FARM)
             packet.write(name)
             self.client.send(packet)
-
-            self.user.switch_state(const.GameStates.HOME_FARM)
+            self.user.switch_state(const.GameStates.GUEST_FARM)
     
     def render(self, target):
         super().render(target)
-        
         self.user.farm.draw(target)
 
     def update(self, dt):
@@ -77,28 +72,55 @@ class HomeFarmState(ClientState):
                 self.client.send(packet)
 
             elif self.gui_manager.point_over_element(self.load_button, x, y) is True:
+                if self.user.user_type == "Student" and self.textbox.last_text is not self.user.user_name:
+                    packet = net.Packet()
+                    packet.write(const.PacketTypes.SWITCH_FARM)
+                    packet.write(self.textbox.last_text)
+                    self.client.send(packet)
+                
+            elif self.gui_manager.point_over_element(self.save_button, x, y) is True:
                 packet = net.Packet()
-                packet.write(const.PacketTypes.SWITCH_FARM)
-                packet.write(self.textbox.last_text)
+                packet.write(const.PacketTypes.SAVE_FARM)
+                self.user.farm.serialize(packet)
                 self.client.send(packet)
         
 class GuestFarmState(ClientState):
-    def __init__(self, client, input, gui):
-        super().__init__(client, input, gui, None)
-        self.user = User(client, "")
+    def __init__(self, client, input, gui, user):
+        super().__init__(client, input, gui, user)
 
     def init(self):
-        pass
+        super().init()
+        self.farm = Farm()
+        
+        # CONTROL WINDOW
+        self.load_button = Button(sf.Vector2(0, 0), "button", self.input, "load")
+        self.home_button = Button(sf.Vector2(0, 32), "button", self.input, "home")
+        self.shop_button = Button(sf.Vector2(104, 0), "button", self.input, "shop")
+        
+        self.textbox = Textbox(sf.Vector2(0, 64), 256, self.user.user_name, self.input)
+        
+        self.ctrl_window = Window(sf.Vector2(0, 0), 256, 128, sf.Color(50, 50, 120, 255), self.input)
+        self.ctrl_window.add_child(self.load_button)
+        self.ctrl_window.add_child(self.home_button)
+        self.ctrl_window.add_child(self.shop_button)
+        self.ctrl_window.add_child(self.textbox)
+        
+        self.gui_manager.add(self.ctrl_window)
 
     def handle_packet(self, packet):
         packet_id = packet.read()
 
         if packet_id == const.PacketTypes.LOAD_FARM:
-            self.user.deserialize(packet)
-            print(self.user.user_name)
+            self.farm.deserialize(packet)
     
     def render(self, target):
         super().render(target)
+        self.farm.draw(target)
 
     def update(self, dt):
         super().update(dt)
+        
+    def on_mouse_button_pressed(self, mouse_button, x, y):
+        if mouse_button == sf.Mouse.LEFT:
+            if self.gui_manager.point_over_element(self.home_button, x, y) is True:
+                self.user.switch_state(const.GameStates.HOME_FARM)

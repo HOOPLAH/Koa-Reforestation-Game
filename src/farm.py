@@ -9,6 +9,9 @@ class Farm:
 
 	def add_farm_item(self, type, x, y):
 		self.farm_items.append(FarmItem(type, sf.Vector2(x, y), farm_items[type].price))
+		
+	def remove_all(self):
+	    self.farm_items = []
 
 	def serialize(self, packet):
 		packet.write(len(self.farm_items))
@@ -18,8 +21,9 @@ class Farm:
 	def deserialize(self, packet):
 		size = packet.read()
 		for i in range(0, size):
-			item = farm_items["koa"]
+			item = FarmItem("koa", sf.Vector2(0, 0), 0)
 			item.deserialize(packet)
+			self.farm_items.append(item)
 
 	def draw(self, target):
 		for item in self.farm_items:

@@ -15,11 +15,13 @@ class FarmItem: # something placeable on the farm (ex. trees)
         
     def serialize(self, packet):
         packet.write(self.type)
+        packet.write(self.price)
         packet.write(self.position.x)
         packet.write(self.position.y)
         
     def deserialize(self, packet):
         self.type = packet.read()
+        self.price = packet.read()
         self.position.x = packet.read()
         self.position.y = packet.read()
         

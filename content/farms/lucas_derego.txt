@@ -1,5 +1,6 @@
-koa 280 89
-iliahi 534 241
-koa 313 249
-koa 179 196
-iliahi 38 260
+koa 63 160
+koa 493 151
+koa 351 186
+koa 199 353
+koa 419 49
+koa 419 49

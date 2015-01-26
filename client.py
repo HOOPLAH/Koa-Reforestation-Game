@@ -24,7 +24,7 @@ user = User(client, "")
 # make all the states
 login_state = LoginState(client, input_sys, gui, user)
 home = HomeFarmState(client, input_sys, gui, user)
-guest = GuestFarmState(client, input_sys, gui)
+guest = GuestFarmState(client, input_sys, gui, user)
 
 user.states = [login_state, home, guest]
 user.state = const.GameStates.LOGIN

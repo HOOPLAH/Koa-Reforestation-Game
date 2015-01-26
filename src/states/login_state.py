@@ -34,7 +34,6 @@ class LoginState(ClientState):
             
         if packet_id == const.PacketTypes.LOGIN:
             self.user.deserialize(packet)
-            self.gui_manager.remove_all()
             self.user.switch_state(const.GameStates.HOME_FARM)
 
     def on_mouse_button_pressed(self, mouse_button, x, y):
@@ -44,7 +43,7 @@ class LoginState(ClientState):
             if contains(self.login_button.local_bounds, sf.Vector2(x, y)):
                 login_packet = net.Packet()
                 login_packet.write(const.PacketTypes.LOGIN)
-                login_packet.write(self.first_textbox.last_text)
-                login_packet.write(self.last_textbox.last_text)
+                login_packet.write(self.first_textbox.last_text) # username
+                login_packet.write(self.last_textbox.last_text) # password
                 self.client.send(login_packet)
             

@@ -1,3 +1,3 @@
-koa 280 89
-iliahi 176 282
-iliahi 543 161
+koa 136 224
+iliahi 379 122
+koa 585 281

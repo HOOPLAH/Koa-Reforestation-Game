@@ -151,5 +151,4 @@ class ServerPacketManager:
         with open("content/farms/"+user.first_name+"_"+user.last_name+".txt") as file:
             for line in file:
                 values = line.split()
-                user.farm.add_farm_item(farm_items[values[0]])
-                user.farm.farm_items[-1].position = sf.Vector2(float(values[1]), float(values[2]))
+                user.farm.add_farm_item(FarmItem(values[0], sf.Vector2(float(values[1]), float(values[2])), farm_items[values[0]].price))

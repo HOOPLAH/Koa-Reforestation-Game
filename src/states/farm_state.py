@@ -106,7 +106,6 @@ class HomeFarmState(ClientState):
         if self.gui_manager.point_over_any_element(pos.x, pos.y) is not True: # mouse isn't over window
             if self.mouse_state == 'down': # mouse is down
                 self.view.move(-move.x, -move.y)
-                print("o")
                 
     def get_current_item(self):
         return self.inventory_drawer[self.current_item]

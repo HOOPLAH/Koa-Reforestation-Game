@@ -3,6 +3,7 @@ from src.states.state import ClientState
 
 import src.net as net
 import src.const as const
+import src.res as res
 from src.rect import contains
 
 from src.GUI.button import Button
@@ -62,25 +63,38 @@ class HomeFarmState(ClientState):
             self.user.switch_state(const.GameStates.GUEST_FARM)
     
     def render(self, target):
+        target.view = self.view
+        self.user.farm.draw(target)
+        target.view = target.default_view
+        
         super().render(target)
         
-        target.view = self.view
+        # DRAW INVENTORY
         
-        self.user.farm.draw(target)
-            
-        target.view = target.default_view
+        item = self.get_current_item()
+        item = FarmItem(item, sf.Vector2(0, 0), farm_items[item].price)
+        item.position = sf.Vector2(790-item.width, 0)
+        item.draw(target)
+        
+        amnt = self.user.inventory[self.get_current_item()]
+        amnt = sf.Text(str(amnt), res.font_8bit, 20)
+        amnt.position = sf.Vector2(item.position.x+item.width/2, item.height/2)
+        target.draw(amnt)
+        
+        # END
 
     def update(self, dt):
         super().update(dt)
         
     def on_mouse_button_pressed(self, mouse_button, x, y):
+        super().on_mouse_button_pressed(mouse_button, x, y)
         if mouse_button == sf.Mouse.LEFT:
             if self.gui_manager.point_over_any_element(x, y) is not True: # mouse isn't over window
                 packet = net.Packet()
                 packet.write(const.PacketTypes.ADD_FARM_ITEM)
                 packet.write(self.get_current_item())
-                packet.write(x)
-                packet.write(y)
+                packet.write(self.input.window.map_pixel_to_coords(sf.Vector2(x, y), self.view).x)
+                packet.write(self.input.window.map_pixel_to_coords(sf.Vector2(x, y), self.view).y)
                 self.client.send(packet)
 
             elif self.gui_manager.point_over_element(self.load_button, x, y) is True:
@@ -106,6 +120,14 @@ class HomeFarmState(ClientState):
         if self.gui_manager.point_over_any_element(pos.x, pos.y) is not True: # mouse isn't over window
             if self.mouse_state == 'down': # mouse is down
                 self.view.move(-move.x, -move.y)
+                
+    def on_mouse_wheel_moved(self, delta, position):
+        self.current_item += delta
+        if self.current_item > len(self.inventory_drawer)-1:
+            self.current_item = 0
+            
+        elif self.current_item < 0:
+            self.current_item = len(self.inventory_drawer)-1
                 
     def get_current_item(self):
         return self.inventory_drawer[self.current_item]

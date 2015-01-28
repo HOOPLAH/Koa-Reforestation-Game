@@ -58,6 +58,7 @@ class ServerPacketManager:
 
             # got all data from packet, send it back with new data
             packet.write(packet_id)
+            self.users[name].serialize(packet)
             self.load_farm(self.users[name])
             self.users[name].farm.serialize(packet)
             self.send(client_id, packet)
@@ -150,4 +151,5 @@ class ServerPacketManager:
         with open("content/farms/"+user.first_name+"_"+user.last_name+".txt") as file:
             for line in file:
                 values = line.split()
-                user.farm.add_farm_item(values[0], float(values[1]), float(values[2]))
+                user.farm.add_farm_item(farm_items[values[0]])
+                user.farm.farm_items[-1].position = sf.Vector2(float(values[1]), float(values[2]))

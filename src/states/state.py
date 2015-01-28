@@ -13,6 +13,8 @@ class ClientState:
         self.gui_manager = gui_manager
         self.user = user
         
+        self.mouse_state = 'up'
+        
     def init(self):
         self.input.add_key_handler(self)
         self.input.add_text_handler(self)

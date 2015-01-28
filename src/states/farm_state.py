@@ -22,6 +22,13 @@ class HomeFarmState(ClientState):
 
     def init(self):
         super().init()
+        self.view = sf.View()
+        self.view.reset(sf.Rectangle((0, 0), (const.WINDOW_WIDTH, const.WINDOW_HEIGHT)))
+        
+        self.current_item = 0 # current item in inventory list
+        self.inventory_drawer = []
+        for item in self.user.inventory:
+            self.inventory_drawer.append(item) # so you get a basic list of each item, accessed through current_item
         
         # CONTROL WINDOW
         self.load_button = Button(sf.Vector2(0, 0), "button", self.input, "load")
@@ -45,7 +52,7 @@ class HomeFarmState(ClientState):
             type = packet.read() # type of tree
             x = packet.read()
             y = packet.read()
-            self.user.farm.add_farm_item(type, x, y)
+            self.user.farm.add_farm_item(FarmItem(type, sf.Vector2(x, y), farm_items[type].price))
 
         elif packet_id == const.PacketTypes.SWITCH_FARM:
             name = packet.read()
@@ -56,7 +63,12 @@ class HomeFarmState(ClientState):
     
     def render(self, target):
         super().render(target)
+        
+        target.view = self.view
+        
         self.user.farm.draw(target)
+            
+        target.view = target.default_view
 
     def update(self, dt):
         super().update(dt)
@@ -66,7 +78,7 @@ class HomeFarmState(ClientState):
             if self.gui_manager.point_over_any_element(x, y) is not True: # mouse isn't over window
                 packet = net.Packet()
                 packet.write(const.PacketTypes.ADD_FARM_ITEM)
-                packet.write("koa")
+                packet.write(self.get_current_item())
                 packet.write(x)
                 packet.write(y)
                 self.client.send(packet)
@@ -83,6 +95,21 @@ class HomeFarmState(ClientState):
                 packet.write(const.PacketTypes.SAVE_FARM)
                 self.user.farm.serialize(packet)
                 self.client.send(packet)
+                
+        if mouse_button == sf.Mouse.RIGHT:
+            for item in reversed(self.user.farm.farm_items):
+                if contains(item.local_bounds, self.input.window.map_pixel_to_coords(sf.Vector2(x, y), self.view)):
+                    self.user.farm.farm_items.remove(item)
+                    break # only delete one tree
+                    
+    def on_mouse_moved(self, pos, move):
+        if self.gui_manager.point_over_any_element(pos.x, pos.y) is not True: # mouse isn't over window
+            if self.mouse_state == 'down': # mouse is down
+                self.view.move(-move.x, -move.y)
+                print("o")
+                
+    def get_current_item(self):
+        return self.inventory_drawer[self.current_item]
         
 class GuestFarmState(ClientState):
     def __init__(self, client, input, gui, user):
@@ -91,13 +118,14 @@ class GuestFarmState(ClientState):
     def init(self):
         super().init()
         self.farm = Farm()
+        self.owner = User(self.client, "")
         
         # CONTROL WINDOW
         self.load_button = Button(sf.Vector2(0, 0), "button", self.input, "load")
         self.home_button = Button(sf.Vector2(0, 32), "button", self.input, "home")
         self.shop_button = Button(sf.Vector2(104, 0), "button", self.input, "shop")
         
-        self.textbox = Textbox(sf.Vector2(0, 64), 256, self.user.user_name, self.input)
+        self.textbox = Textbox(sf.Vector2(0, 64), 256, self.owner.user_name, self.input)
         
         self.ctrl_window = Window(sf.Vector2(0, 0), 256, 128, sf.Color(50, 50, 120, 255), self.input)
         self.ctrl_window.add_child(self.load_button)
@@ -111,7 +139,11 @@ class GuestFarmState(ClientState):
         packet_id = packet.read()
 
         if packet_id == const.PacketTypes.LOAD_FARM:
+            self.owner.deserialize(packet)
             self.farm.deserialize(packet)
+            
+            self.textbox.default_text = self.owner.user_name
+            self.textbox.text.string = self.owner.user_name
     
     def render(self, target):
         super().render(target)

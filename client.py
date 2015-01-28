@@ -12,7 +12,7 @@ from src.states.farm_state import GuestFarmState
 from src.user import User
 
 # create the main window
-window = sf.RenderWindow(sf.VideoMode(800, 480), "Koa Reforestation Client")
+window = sf.RenderWindow(sf.VideoMode(const.WINDOW_WIDTH, const.WINDOW_HEIGHT), "Koa Reforestation Client")
 
 # Connect to server
 client = net.Client("localhost", const.PORT)

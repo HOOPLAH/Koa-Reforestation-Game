@@ -98,7 +98,7 @@ class HomeFarmState(ClientState):
                 self.client.send(packet)
 
             elif self.gui_manager.point_over_element(self.load_button, x, y) is True:
-                if self.user.user_type == "Student" and self.textbox.last_text is not self.user.user_name:
+                if self.textbox.last_text is not self.user.user_name:
                     packet = net.Packet()
                     packet.write(const.PacketTypes.SWITCH_FARM)
                     packet.write(self.textbox.last_text)
@@ -132,6 +132,45 @@ class HomeFarmState(ClientState):
     def get_current_item(self):
         return self.inventory_drawer[self.current_item]
         
+## TEACHER FARM STATE
+        
+class TeacherHomeFarmState(HomeFarmState):
+    def __init__(self, client, input, gui, user):
+        super().__init__(client, input, gui, user)
+        
+    def init(self):
+        super().init()
+        print("yeeee")
+        
+    def handle_packet(self, packet):
+        packet_id = packet.read()
+        
+        if packet_id == const.PacketTypes.ADD_FARM_ITEM:
+            type = packet.read() # type of tree
+            x = packet.read()
+            y = packet.read()
+            self.user.farm.add_farm_item(FarmItem(type, sf.Vector2(x, y), farm_items[type].price))
+
+        elif packet_id == const.PacketTypes.SWITCH_FARM:
+            name = packet.read()
+            packet.write(const.PacketTypes.LOAD_FARM)
+            packet.write(name)
+            self.client.send(packet)
+            self.user.switch_state(const.GameStates.GUEST_FARM)
+    
+    def render(self, target):
+        super().render(target)
+
+    def update(self, dt):
+        super().update(dt)
+        
+    def on_mouse_button_pressed(self, mouse_button, x, y):
+        super().on_mouse_button_pressed(mouse_button, x, y)
+        if mouse_button == sf.Mouse.LEFT:
+            pass
+        
+## GUEST FARM
+        
 class GuestFarmState(ClientState):
     def __init__(self, client, input, gui, user):
         super().__init__(client, input, gui, user)
@@ -159,7 +198,7 @@ class GuestFarmState(ClientState):
     def handle_packet(self, packet):
         packet_id = packet.read()
 
-        if packet_id == const.PacketTypes.LOAD_FARM:
+        if packet_id == const.PacketTypes.LOAD_FARM: # when you first get into the state
             self.owner.deserialize(packet)
             self.farm.deserialize(packet)
             
@@ -177,3 +216,11 @@ class GuestFarmState(ClientState):
         if mouse_button == sf.Mouse.LEFT:
             if self.gui_manager.point_over_element(self.home_button, x, y) is True:
                 self.user.switch_state(const.GameStates.HOME_FARM)
+                    
+            elif self.gui_manager.point_over_element(self.load_button, x, y) is True:
+                if self.textbox.last_text != self.user.user_name:
+                    print(self.textbox.last_text, self.user.user_name)
+                    packet = net.Packet()
+                    packet.write(const.PacketTypes.SWITCH_FARM)
+                    packet.write(self.textbox.last_text)
+                    self.client.send(packet)

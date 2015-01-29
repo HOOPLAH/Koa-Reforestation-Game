@@ -9,9 +9,10 @@ PORT = 50002
 class GameStates(IntEnum):
 	LOGIN = 0
 	HOME_FARM = 1
-	GUEST_FARM = 2
-	SHOP = 3
-	STATISTICS = 4
+	TEACHER_HOME_FARM = 2
+	GUEST_FARM = 3
+	SHOP = 4
+	STATISTICS = 5
 
 class PacketTypes(IntEnum):
     LOGIN = 0

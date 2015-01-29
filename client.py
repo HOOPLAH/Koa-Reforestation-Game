@@ -7,6 +7,7 @@ from src.GUI.gui_manager import GUIManager
 
 from src.states.login_state import LoginState
 from src.states.farm_state import HomeFarmState
+from src.states.farm_state import TeacherHomeFarmState
 from src.states.farm_state import GuestFarmState
 
 from src.user import User
@@ -24,9 +25,10 @@ user = User(client, "")
 # make all the states
 login_state = LoginState(client, input_sys, gui, user)
 home = HomeFarmState(client, input_sys, gui, user)
+teacher = TeacherHomeFarmState(client, input_sys, gui, user)
 guest = GuestFarmState(client, input_sys, gui, user)
 
-user.states = [login_state, home, guest]
+user.states = [login_state, home, teacher, guest]
 user.state = const.GameStates.LOGIN
 user.states[user.state].init()
 

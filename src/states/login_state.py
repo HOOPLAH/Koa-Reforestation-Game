@@ -34,7 +34,10 @@ class LoginState(ClientState):
             
         if packet_id == const.PacketTypes.LOGIN:
             self.user.deserialize(packet)
-            self.user.switch_state(const.GameStates.HOME_FARM)
+            if self.user.user_type == "Student":
+                self.user.switch_state(const.GameStates.HOME_FARM)
+            elif self.user.user_type == "Teacher":
+                self.user.switch_state(const.GameStates.TEACHER_HOME_FARM)
 
     def on_mouse_button_pressed(self, mouse_button, x, y):
         super().on_mouse_button_pressed(mouse_button, x , y)

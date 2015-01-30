@@ -18,8 +18,8 @@ class LoginState(ClientState):
     def init(self):
         super().init()
 
-        self.first_textbox = Textbox(sf.Vector2(0, 16), 256, "lucas", self.input)
-        self.last_textbox = Textbox(sf.Vector2(0, 48), 256, "derego1", self.input)
+        self.first_textbox = Textbox(sf.Vector2(0, 16), 256, "joel", self.input)
+        self.last_textbox = Textbox(sf.Vector2(0, 48), 256, "truesdell", self.input)
         self.login_button = Button(sf.Vector2(124-48, 80), "button", self.input, "login")
 
         self.window = Window(sf.Vector2(272, 112), 256, 128, sf.Color(50, 50, 120, 255), self.input)
@@ -34,10 +34,7 @@ class LoginState(ClientState):
             
         if packet_id == const.PacketTypes.LOGIN:
             self.user.deserialize(packet)
-            if self.user.user_type == "Student":
-                self.user.switch_state(const.GameStates.HOME_FARM)
-            elif self.user.user_type == "Teacher":
-                self.user.switch_state(const.GameStates.TEACHER_HOME_FARM)
+            self.user.switch_state(const.GameStates.HOME_FARM)
 
     def on_mouse_button_pressed(self, mouse_button, x, y):
         super().on_mouse_button_pressed(mouse_button, x , y)

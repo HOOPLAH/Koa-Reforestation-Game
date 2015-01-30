@@ -17,6 +17,9 @@ class Element:
     def add_child(self, element):
         self.children.append(element)
         
+    def remove_child(self, element):
+        self.children.remove(element)
+        
     def on_key_pressed(self, key_code):
         pass
     

@@ -73,6 +73,11 @@ class ServerPacketManager:
                 file.writelines(line)
                 
             file.close()
+            
+        elif packet_id == const.PacketTypes.ADD_POINTS:
+            name = packet.read()
+            points = packet.read()
+            print(name, points)
         
     def send(self, client_id, packet):
         self.server.send(client_id, packet)

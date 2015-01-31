@@ -237,3 +237,9 @@ class TeacherGuestFarmState(GuestFarmState):
                 packet.write(self.owner.user_name) # name of person
                 packet.write(self.points_textbox.last_text)
                 self.client.send(packet)
+            elif self.gui_manager.point_over_element(self.set_button, x, y) is True:
+                packet = net.Packet()
+                packet.write(const.PacketTypes.SET_POINTS)
+                packet.write(self.owner.user_name) # name of person
+                packet.write(self.points_textbox.last_text)
+                self.client.send(packet)

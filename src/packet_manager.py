@@ -66,18 +66,22 @@ class ServerPacketManager:
         elif packet_id == const.PacketTypes.SAVE_FARM:
             farm = Farm()
             farm.deserialize(packet)
-            user = self.connected_users[client_id]
-            file = open("content/farms/"+user.first_name+"_"+user.last_name+".txt", "w+")
-            for item in farm.farm_items:
-                line = [str(item.type), " ", str(int(item.position.x)), " ", str(int(item.position.y)), "\n"]
-                file.writelines(line)
-                
-            file.close()
+            self.save_farm(self.connected_users[client_id], farm)
             
         elif packet_id == const.PacketTypes.ADD_POINTS:
             name = packet.read()
-            points = packet.read()
-            print(name, points)
+            points = float(packet.read())
+            self.users[name].points = float(self.users[name].points)
+            self.users[name].points += points
+            print(self.users[name].points)
+            self.save_user_data(self.users[name])
+
+        elif packet_id == const.PacketTypes.SET_POINTS:
+            name = packet.read()
+            points = float(packet.read())
+            self.users[name].points = points
+            print(self.users[name].points)
+            self.save_user_data(self.users[name])
         
     def send(self, client_id, packet):
         self.server.send(client_id, packet)
@@ -89,6 +93,11 @@ class ServerPacketManager:
     #                                            #
     #                                            #
     # FN TO SHORTEN CODE ABOVE -- WARNING: MESSY #
+
+    def write_to_file(self, path, text, option):
+        file = open(path, option)
+        file.writelines(text)
+        file.close()
     
     # --
     # REGISTER STUDENTS
@@ -144,12 +153,22 @@ class ServerPacketManager:
         with open("content/users/"+user.first_name+"_"+user.last_name+".txt") as file:
             user.points = file.readline()
             
-            inventory_size = file.readline() # make sure this is the last bit of data in file
-            for line in file:
-                values = line.split()
-                type = values[0]
-                amount = values[1]
-                user.inventory[type] = amount
+            inventory_size = int(file.readline()) # make sure this is the last bit of data in file
+            if inventory_size > 0:
+                for line in file:
+                    values = line.split()
+                    type = values[0]
+                    amount = values[1]
+                    user.inventory[type] = amount
+
+    def save_user_data(self, user):
+        path = "content/users/"+user.first_name+"_"+user.last_name+".txt"
+        file = open(path, "w+")
+        file.writelines([str(user.points), "\n"])
+        file.writelines([str(len(user.inventory)), "\n"])
+        file.close
+        for item in user.inventory:
+            self.write_to_file(path, [str(item.type), " ", str(self.user.inventory[item.type], "\n")], 'a')
             
     def load_farm(self, user):
         user.farm.remove_all()
@@ -157,3 +176,11 @@ class ServerPacketManager:
             for line in file:
                 values = line.split()
                 user.farm.add_farm_item(FarmItem(values[0], sf.Vector2(float(values[1]), float(values[2])), farm_items[values[0]].price))
+
+    def save_farm(self, user, farm):
+        file = open("content/farms/"+user.first_name+"_"+user.last_name+".txt", "w+")
+        for item in farm.farm_items:
+            line = [str(item.type), " ", str(int(item.position.x)), " ", str(int(item.position.y)), "\n"]
+            file.writelines(line)
+            
+        file.close()

@@ -22,3 +22,4 @@ class PacketTypes(IntEnum):
     LOAD_FARM = 4
     SAVE_FARM = 5
     ADD_POINTS = 6
+    SET_POINTS = 7

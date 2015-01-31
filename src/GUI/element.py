@@ -45,7 +45,7 @@ class Element:
         pass
 
 class SpriteElement(Element):
-    def __init__(self, pos, type, frames, frames_per_row, input):
+    def __init__(self, pos, type, input, frames, frames_per_row):
         super().__init__(pos, input)
         self.sprite = SpriteSheet(res.textures[type])
         self.sprite.init(frames, frames_per_row)

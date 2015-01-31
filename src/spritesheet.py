@@ -8,7 +8,7 @@ class SpriteSheet(sf.Sprite):
         self.time = 0
         self.frame = 0
         self.start_frame = 0
-        self.stop_frame = frames-1
+        self.stop_frame = int(frames)-1
         self.frame_dim = sf.Vector2(self.texture.width/frames_per_row, self.texture.height/(frames/frames_per_row))
         self.loop = True
         self.loop_done = False

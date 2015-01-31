@@ -92,7 +92,7 @@ class HomeFarmState(ClientState):
     def on_mouse_button_pressed(self, mouse_button, x, y):
         super().on_mouse_button_pressed(mouse_button, x, y)
         if mouse_button == sf.Mouse.LEFT:
-            if self.gui_manager.point_over_any_element(x, y) is not True: # mouse isn't over window
+            if self.gui_manager.point_over_any_element(x, y) is not True and self.loaded is True: # mouse isn't over window
                 packet = net.Packet()
                 packet.write(const.PacketTypes.ADD_FARM_ITEM)
                 packet.write(self.get_current_item())
@@ -112,6 +112,9 @@ class HomeFarmState(ClientState):
                 packet.write(const.PacketTypes.SAVE_FARM)
                 self.user.farm.serialize(packet)
                 self.client.send(packet)
+
+            elif self.gui_manager.point_over_element(self.shop_button, x, y) is True:
+                self.user.switch_state(const.GameStates.SHOP)
                 
         if mouse_button == sf.Mouse.RIGHT:
             for item in reversed(self.user.farm.farm_items):
@@ -133,7 +136,10 @@ class HomeFarmState(ClientState):
             self.current_item = len(self.inventory_drawer)-1
                 
     def get_current_item(self):
-        return self.inventory_drawer[self.current_item]
+        if len(self.inventory_drawer) >= 1:
+            return self.inventory_drawer[self.current_item]
+        else:
+            return None
         
 ## GUEST FARM
         

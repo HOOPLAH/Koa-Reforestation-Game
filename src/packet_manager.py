@@ -43,6 +43,15 @@ class ServerPacketManager:
             packet.write(y)
             self.send(client_id, packet)
 
+        elif packet_id == const.PacketTypes.ADD_INVENTORY_ITEM:
+            type = packet.read()
+            self.connected_users[client_id].inventory[type] = int(self.connected_users[client_id].inventory[type]) # intify it
+            self.connected_users[client_id].inventory[type] += 1
+            
+            packet.write(packet_id)
+            self.connected_users[client_id].serialize(packet)
+            self.send(client_id, packet)
+
         elif packet_id == const.PacketTypes.SWITCH_FARM:
             name = packet.read()
 
@@ -73,14 +82,12 @@ class ServerPacketManager:
             points = float(packet.read())
             self.users[name].points = float(self.users[name].points)
             self.users[name].points += points
-            print(self.users[name].points)
             self.save_user_data(self.users[name])
 
         elif packet_id == const.PacketTypes.SET_POINTS:
             name = packet.read()
             points = float(packet.read())
             self.users[name].points = points
-            print(self.users[name].points)
             self.save_user_data(self.users[name])
         
     def send(self, client_id, packet):

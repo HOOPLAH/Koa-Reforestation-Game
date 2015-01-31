@@ -16,6 +16,7 @@ class ClientState:
         self.mouse_state = 'up'
         
     def init(self):
+        self.loaded = False
         self.input.add_key_handler(self)
         self.input.add_text_handler(self)
         self.input.add_mouse_handler(self)
@@ -29,7 +30,8 @@ class ClientState:
     	self.gui_manager.draw(target)
 
     def update(self, dt):
-    	self.gui_manager.update(dt)
+        self.gui_manager.update(dt)
+        self.loaded = True
 
     # KEYBOARD
     def on_key_pressed(self, key_code):

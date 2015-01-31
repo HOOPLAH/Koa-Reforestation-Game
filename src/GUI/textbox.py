@@ -6,7 +6,7 @@ from src.rect import contains
 
 class Textbox(SpriteElement):
     def __init__(self, pos, width, default_text, input):
-        super().__init__(pos, "textbox", 1, 1, input)
+        super().__init__(pos, "textbox", input, 1, 1)
         self.sprite.scale(sf.Vector2(width/self.sprite.texture.width, 1))
         
         self.text_offset = sf.Vector2(7, 3)

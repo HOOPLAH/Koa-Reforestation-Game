@@ -11,5 +11,7 @@ font_farmville = sf.Font.from_file("content/fonts/farmville.ttf")
 textures = {}
 textures["koa"] = sf.Texture.from_file("content/textures/koa.png")
 textures["iliahi"] = sf.Texture.from_file("content/textures/iliahi.png")
+
 textures["button"] = sf.Texture.from_file("content/gui/button.png")
 textures["textbox"] = sf.Texture.from_file("content/gui/textbox.png")
+textures["close"] = sf.Texture.from_file("content/gui/close.png")

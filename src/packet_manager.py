@@ -83,12 +83,18 @@ class ServerPacketManager:
             self.users[name].points = float(self.users[name].points)
             self.users[name].points += points
             self.save_user_data(self.users[name])
+            # messes up inventory
 
         elif packet_id == const.PacketTypes.SET_POINTS:
             name = packet.read()
             points = float(packet.read())
             self.users[name].points = points
             self.save_user_data(self.users[name])
+
+        elif packet_id == const.PacketTypes.GET_USER:
+            packet.write(packet_id)
+            self.connected_users[client_id].serialize(packet)
+            self.send(client_id, packet)
         
     def send(self, client_id, packet):
         self.server.send(client_id, packet)
@@ -173,9 +179,9 @@ class ServerPacketManager:
         file = open(path, "w+")
         file.writelines([str(user.points), "\n"])
         file.writelines([str(len(user.inventory)), "\n"])
-        file.close
+        file.close()
         for item in user.inventory:
-            self.write_to_file(path, [str(item.type), " ", str(self.user.inventory[item.type], "\n")], 'a')
+            self.write_to_file(path, [str(item), " ", str(user.inventory[item]), "\n"], 'a')
             
     def load_farm(self, user):
         user.farm.remove_all()

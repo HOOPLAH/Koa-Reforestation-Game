@@ -10,6 +10,7 @@ from src.states.farm_state import HomeFarmState
 from src.states.farm_state import GuestFarmState
 from src.states.farm_state import TeacherGuestFarmState
 from src.states.shop_state import ShopState
+from src.states.statistics_state import StatisticsState
 
 from src.user import User
 
@@ -29,9 +30,9 @@ home = HomeFarmState(client, input_sys, gui, user)
 guest = GuestFarmState(client, input_sys, gui, user)
 teacher = TeacherGuestFarmState(client, input_sys, gui, user)
 shop = ShopState(client, input_sys, gui, user)
-#stats = StatsState()
+stats = StatisticsState(client, input_sys, gui, user)
 
-user.states = [login, home, guest, teacher, shop]
+user.states = [login, home, guest, teacher, shop, stats]
 user.state = const.GameStates.LOGIN
 user.states[user.state].init()
 

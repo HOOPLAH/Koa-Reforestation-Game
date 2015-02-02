@@ -32,9 +32,10 @@ class HomeFarmState(ClientState):
             self.inventory_drawer.append(item) # so you get a basic list of each item, accessed through current_item
         
         # CONTROL WINDOW
-        self.load_button = Button(sf.Vector2(16, 0), "button", self.input, "load")
-        self.save_button = Button(sf.Vector2(144, 0), "button", self.input, "save")
-        self.shop_button = Button(sf.Vector2(80, 32), "button", self.input, "shop")
+        self.load_button =  Button(sf.Vector2(16, 0), "button", self.input, "load")
+        self.save_button =  Button(sf.Vector2(144, 0), "button", self.input, "save")
+        self.shop_button =  Button(sf.Vector2(16, 32), "button", self.input, "shop")
+        self.stats_button = Button(sf.Vector2(144, 32), "button", self.input, "stats")
         
         self.textbox = Textbox(sf.Vector2(0, 64), 256, "lucas", self.input)
         
@@ -42,6 +43,7 @@ class HomeFarmState(ClientState):
         self.window.add_child(self.load_button)
         self.window.add_child(self.save_button)
         self.window.add_child(self.shop_button)
+        self.window.add_child(self.stats_button)
         self.window.add_child(self.textbox)
         
         self.gui_manager.add(self.window)
@@ -115,6 +117,9 @@ class HomeFarmState(ClientState):
 
             elif self.gui_manager.point_over_element(self.shop_button, x, y) is True:
                 self.user.switch_state(const.GameStates.SHOP)
+
+            elif self.gui_manager.point_over_element(self.stats_button, x, y) is True:
+                self.user.switch_state(const.GameStates.STATS)
                 
         if mouse_button == sf.Mouse.RIGHT:
             for item in reversed(self.user.farm.farm_items):
@@ -140,6 +145,10 @@ class HomeFarmState(ClientState):
             return self.inventory_drawer[self.current_item]
         else:
             return None
+
+
+
+
         
 ## GUEST FARM
         
@@ -194,6 +203,10 @@ class GuestFarmState(ClientState):
                     packet.write(const.PacketTypes.SWITCH_FARM)
                     packet.write(self.textbox.last_text)
                     self.client.send(packet)
+
+
+
+
                     
 ## TEACHER GUEST FARM STATE
 

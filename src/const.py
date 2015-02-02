@@ -12,7 +12,7 @@ class GameStates(IntEnum):
 	GUEST_FARM = 2
 	TEACHER_GUEST_FARM = 3
 	SHOP = 4
-	STATISTICS = 5
+	STATS = 5
 
 class PacketTypes(IntEnum):
     LOGIN = 0
@@ -23,3 +23,4 @@ class PacketTypes(IntEnum):
     SAVE_FARM = 5
     ADD_POINTS = 6
     SET_POINTS = 7
+    GET_USER = 8

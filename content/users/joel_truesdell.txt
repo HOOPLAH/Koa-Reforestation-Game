@@ -1,4 +1,4 @@
-10000
+50.0
 2
-koa 1
-iliahi 1
+koa 0
+iliahi 0

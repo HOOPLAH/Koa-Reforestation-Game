@@ -23,6 +23,11 @@ class HomeFarmState(ClientState):
 
     def init(self):
         super().init()
+
+        packet = net.Packet()
+        packet.write(const.PacketTypes.GET_USER)
+
+        self.client.send(packet)
         self.view = sf.View()
         self.view.reset(sf.Rectangle((0, 0), (const.WINDOW_WIDTH, const.WINDOW_HEIGHT)))
         
@@ -66,6 +71,9 @@ class HomeFarmState(ClientState):
                 self.user.switch_state(const.GameStates.GUEST_FARM)
             else:
                 self.user.switch_state(const.GameStates.TEACHER_GUEST_FARM)
+
+        elif packet_id == const.PacketTypes.GET_USER:
+            self.user.deserialize(packet)
     
     def render(self, target):
         target.view = self.view

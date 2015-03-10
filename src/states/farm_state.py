@@ -26,15 +26,15 @@ class HomeFarmState(ClientState):
 
         packet = net.Packet()
         packet.write(const.PacketTypes.GET_USER)
-
         self.client.send(packet)
+        
         self.view = sf.View()
         self.view.reset(sf.Rectangle((0, 0), (const.WINDOW_WIDTH, const.WINDOW_HEIGHT)))
         
         self.current_item = 0 # current item in inventory list
         self.inventory_drawer = []
         for item in self.user.inventory:
-            self.inventory_drawer.append(item) # so you get a basic list of each item, accessed through current_item
+            self.inventory_drawer.append(item) # so you get a basic list of each item, accessed through self.current_item
         
         # CONTROL WINDOW
         self.load_button =  Button(sf.Vector2(16, 0), "button", self.input, "load")
@@ -52,6 +52,7 @@ class HomeFarmState(ClientState):
         self.window.add_child(self.textbox)
         
         self.gui_manager.add(self.window)
+        # END CONTROL WINDOW
         
     def handle_packet(self, packet):
         packet_id = packet.read()
@@ -68,8 +69,10 @@ class HomeFarmState(ClientState):
             packet.write(name)
             self.client.send(packet)
             if self.user.user_type == "Student":
+                self.user.farm.remove_all()
                 self.user.switch_state(const.GameStates.GUEST_FARM)
             else:
+                self.user.farm.remove_all()
                 self.user.switch_state(const.GameStates.TEACHER_GUEST_FARM)
 
         elif packet_id == const.PacketTypes.GET_USER:
@@ -83,24 +86,24 @@ class HomeFarmState(ClientState):
         super().render(target)
         
         # DRAW INVENTORY
-        
-        item = self.get_current_item()
-        item = FarmItem(item, sf.Vector2(0, 0), farm_items[item].price)
-        item.position = sf.Vector2(790-item.width, 0)
-        item.draw(target)
-        
-        amnt = self.user.inventory[self.get_current_item()]
-        amnt = sf.Text(str(amnt), res.font_8bit, 20)
-        amnt.position = sf.Vector2(item.position.x+item.width/2, item.height/2)
-        target.draw(amnt)
-        
-        # END
+        if len(self.inventory_drawer) > 0:
+            item = self.get_current_item()
+            item = FarmItem(item, sf.Vector2(0, 0), farm_items[item].price)
+            item.position = sf.Vector2(790-item.width, 0)
+            item.draw(target)
+            
+            amnt = self.user.inventory[self.get_current_item()]
+            amnt = sf.Text(str(amnt), res.font_8bit, 20)
+            amnt.position = sf.Vector2(item.position.x+item.width/2, item.height/2)
+            target.draw(amnt)
+        # END DRAW INVENTORY
 
     def update(self, dt):
         super().update(dt)
         
     def on_mouse_button_pressed(self, mouse_button, x, y):
         super().on_mouse_button_pressed(mouse_button, x, y)
+        # left
         if mouse_button == sf.Mouse.LEFT:
             if self.gui_manager.point_over_any_element(x, y) is not True and self.loaded is True: # mouse isn't over window
                 packet = net.Packet()
@@ -128,10 +131,12 @@ class HomeFarmState(ClientState):
 
             elif self.gui_manager.point_over_element(self.stats_button, x, y) is True:
                 self.user.switch_state(const.GameStates.STATS)
-                
+        
+        # RIGHT
         if mouse_button == sf.Mouse.RIGHT:
             for item in reversed(self.user.farm.farm_items):
                 if contains(item.local_bounds, self.input.window.map_pixel_to_coords(sf.Vector2(x, y), self.view)):
+                    print("hello world")
                     self.user.farm.farm_items.remove(item)
                     break # only delete one tree
                     
@@ -156,9 +161,11 @@ class HomeFarmState(ClientState):
 
 
 
-
+######################################################################
         
 ## GUEST FARM
+
+######################################################################
         
 class GuestFarmState(ClientState):
     def __init__(self, client, input, gui, user):
@@ -214,9 +221,11 @@ class GuestFarmState(ClientState):
 
 
 
-
+######################################################################
                     
 ## TEACHER GUEST FARM STATE
+
+######################################################################
 
 class TeacherGuestFarmState(GuestFarmState):
     def __init__(self, client, input, gui, user):
